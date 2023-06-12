@@ -61,8 +61,8 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/ModelCoefficients.h>
 
-#include <velodyne_pointcloud/point_types.h>
-#include <velodyne_pointcloud/pointcloudXYZIR.h> 
+#include <velodyne_pcl/point_types.h>
+#include <velodyne_pointcloud/pointcloudXYZIRT.h> 
 
 
 #include "lidartag_msgs/LiDARTagDetection.h"
