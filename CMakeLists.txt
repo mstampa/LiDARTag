@@ -29,7 +29,7 @@ find_package(NLopt REQUIRED)
 # PCL
 find_package(PCL 1.2 REQUIRED)
 find_package(Boost REQUIRED
-             COMPONENTS filesystem system signals regex date_time program_options thread
+  COMPONENTS filesystem system regex date_time program_options thread
 )
 
 # NLOPT
