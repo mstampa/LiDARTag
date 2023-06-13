@@ -38,6 +38,8 @@
 #include <velodyne_pcl/point_types.h>
 #include <velodyne_pointcloud/pointcloudXYZIRT.h>
 
+#include <Eigen/Core>
+
 #include <algorithm>  // to use to_lower function
 #include <math.h>
 #include <stdarg.h>  // for variadic functions

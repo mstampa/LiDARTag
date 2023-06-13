@@ -32,10 +32,11 @@
 #ifndef LIDARTAG_H
 #define LIDARTAG_H
 
-#include "lidartag_msgs/LiDARTagDetection.h"
-#include "lidartag_msgs/LiDARTagDetectionArray.h"
 #include "types.h"
 #include "thread_pool.h"
+
+#include <lidartag_msgs/LiDARTagDetection.h>
+#include <lidartag_msgs/LiDARTagDetectionArray.h>
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>

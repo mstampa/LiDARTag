@@ -31,6 +31,7 @@
 #include "utils.h"
 
 #include <algorithm>  // std::sort, std::stable_sort
+#include <chrono>
 #include <iostream>
 #include <math.h>
 #include <numeric>  // std::iota
@@ -40,25 +41,27 @@ namespace BipedLab
 namespace utils
 {
 // second
-double spendCPUTime(const std::clock_t& t_end, const std::clock_t& t_start)
+double spendCPUTime(const clock_t& t_end, const clock_t& t_start)
 {
   return (((double)(t_end - t_start)) / CLOCKS_PER_SEC);
 }
 
-double spendCPUHz(const std::clock_t& t_end, const std::clock_t& t_start)
+double spendCPUHz(const clock_t& t_end, const clock_t& t_start)
 {
   return 1.0 / spendCPUTime(t_end, t_start);
 }
 
-double printSpendCPUHz(const std::clock_t& t_end, const std::clock_t& t_start, std::string txt)
+double printSpendCPUHz(const clock_t& t_end, const clock_t& t_start, std::string txt)
 {
-  std::cout << std::fixed << std::setprecision(2) << txt << spendCPUHz(t_end, t_start) << " [Hz]" << std::endl;
+  auto ans = spendCPUHz(t_end, t_start);
+  std::cout << std::fixed << std::setprecision(2) << txt << ans << " [Hz]" << std::endl;
+  return ans;
 }
 
 double printSpendCPUHz(const std::clock_t& t_end, const std::clock_t& t_start)
 {
   std::string text = "CPU time used: ";
-  printSpendCPUHz(t_end, t_start, text);
+  return printSpendCPUHz(t_end, t_start, text);
 }
 
 double spendElapsedTime(const std::chrono::steady_clock::time_point& t_end,
@@ -83,14 +86,16 @@ double spendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
 double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
                            const std::chrono::steady_clock::time_point& t_start, std::string txt)
 {
-  std::cout << std::fixed << std::setprecision(2) << txt << spendElapsedHz(t_end, t_start) << " [Hz]" << std::endl;
+  auto ans = spendElapsedHz(t_end, t_start);
+  std::cout << std::fixed << std::setprecision(2) << txt << ans << " [Hz]" << std::endl;
+  return ans;
 }
 
 double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
                            const std::chrono::steady_clock::time_point& t_start)
 {
   std::string text = "Elapsed time: ";
-  printSpendElapsedHz(t_end, t_start, text);
+  return printSpendElapsedHz(t_end, t_start, text);
 }
 
 std::string tranferToLowercase(std::string& t_data)
@@ -622,11 +627,6 @@ Eigen::Matrix3d qToR(const Eigen::Vector3f& t_pose)
   R(2, 2) = std::pow(a, 2) - std::pow(b, 2) - std::pow(c, 2) + std::pow(d, 2);
 
   return R;
-}
-
-Eigen::Matrix3d qMultiplication(const double& q1_w, const Eigen::Vector3f& q1, const double& q2_w,
-                                const Eigen::Vector3f& q2)
-{
 }
 
 /*

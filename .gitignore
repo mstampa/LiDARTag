@@ -1,5 +1,7 @@
-output/*
+build/*
 matlab/paper_data/*
+output/*
 .vscode/*
+
 *.mat
 *.m~
