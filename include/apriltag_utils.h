@@ -1,7 +1,7 @@
 /* Copyright (C) 2013-2020, The Regents of The University of Michigan.
  * All rights reserved.
- * This software was developed in the Biped Lab (https://www.biped.solutions/) 
- * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may 
+ * This software was developed in the Biped Lab (https://www.biped.solutions/)
+ * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may
  * be available under alternative licensing terms; contact the address above.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
  * The views and conclusions contained in the software and documentation are those
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the Regents of The University of Michigan.
- * 
+ *
  * AUTHOR: Bruce JK Huang (bjhuang@umich.edu)
  * WEBSITE: https://www.brucerobot.com/
  */
@@ -33,27 +33,23 @@
 
 #include "lidartag.h"
 
-namespace BipedAprilLab{
+namespace BipedAprilLab
+{
+static inline int imax(int a, int b);
 
-    static inline int imax(int a, int b);
+/** if the bits in w were arranged in a d*d grid and that grid was
+ * rotated, what would the new bits in w be?
+ * The bits are organized like this (for d = 3):
+ *
+ *  8 7 6       2 5 8      0 1 2
+ *  5 4 3  ==>  1 4 7 ==>  3 4 5    (rotate90 applied twice)
+ *  2 1 0       0 3 6      6 7 8
+ **/
+uint64_t rotate90(uint64_t w, uint32_t d);
 
+void QuickDecodeAdd(BipedLab::QuickDecode_t* qd, uint64_t code, int id, int hamming);
 
-    /** if the bits in w were arranged in a d*d grid and that grid was
-     * rotated, what would the new bits in w be?
-     * The bits are organized like this (for d = 3):
-     *
-     *  8 7 6       2 5 8      0 1 2
-     *  5 4 3  ==>  1 4 7 ==>  3 4 5    (rotate90 applied twice)
-     *  2 1 0       0 3 6      6 7 8
-     **/
-    uint64_t rotate90(uint64_t w, uint32_t d);
-
-    void QuickDecodeAdd(BipedLab::QuickDecode_t *qd, uint64_t code, int id, int hamming);
-
-    void QuickDecodeInit(BipedLab::GrizTagFamily_t *family, int maxhamming);
-    void QuickDecodeCodeword(BipedLab::GrizTagFamily_t *tf, uint64_t rcode, 
-                             BipedLab::QuickDecodeEntry_t *entry);
-} // namespace
+void QuickDecodeInit(BipedLab::GrizTagFamily_t* family, int maxhamming);
+void QuickDecodeCodeword(BipedLab::GrizTagFamily_t* tf, uint64_t rcode, BipedLab::QuickDecodeEntry_t* entry);
+}  // namespace BipedAprilLab
 #endif
-
-

@@ -1,7 +1,7 @@
 /* Copyright (C) 2013-2020, The Regents of The University of Michigan.
  * All rights reserved.
- * This software was developed in the Biped Lab (https://www.biped.solutions/) 
- * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may 
+ * This software was developed in the Biped Lab (https://www.biped.solutions/)
+ * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may
  * be available under alternative licensing terms; contact the address above.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
  * The views and conclusions contained in the software and documentation are those
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the Regents of The University of Michigan.
- * 
+ *
  * AUTHOR: Bruce JK Huang (bjhuang@umich.edu)
  * WEBSITE: https://www.brucerobot.com/
  */
@@ -32,16 +32,14 @@
 
 #include <ros/ros.h>
 
-
 using namespace std;
 
-int main(int argc, char **argv){
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "lidar_tag_node");
+  BipedLab::LiDARTag lidar_tag;
 
-    ros::init(argc, argv, "lidar_tag_node");
-    BipedLab::LiDARTag lidar_tag;
+  cout << "Done!" << endl;
 
-    cout << "Done!" << endl;
-
-    return 0;
+  return 0;
 }
-

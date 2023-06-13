@@ -1,7 +1,7 @@
 /* Copyright (C) 2013-2020, The Regents of The University of Michigan.
  * All rights reserved.
- * This software was developed in the Biped Lab (https://www.biped.solutions/) 
- * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may 
+ * This software was developed in the Biped Lab (https://www.biped.solutions/)
+ * under the direction of Jessy Grizzle, grizzle@umich.edu. This software may
  * be available under alternative licensing terms; contact the address above.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
  * The views and conclusions contained in the software and documentation are those
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the Regents of The University of Michigan.
- * 
+ *
  * AUTHOR: Bruce JK Huang (bjhuang@umich.edu)
  * WEBSITE: https://www.brucerobot.com/
  */
@@ -45,38 +45,38 @@ constexpr int beams = 32;
  * which can be found in the VLP-32C manual.
  */
 constexpr float el[] = {
-    -25.0,   // 0
-    -15.639, // 3
-    -11.310, // 4
-    -8.843,  // 7
-    -7.254,  // 8
-    -6.148,  // 11
-    -5.333,  // 12
-    -4.667,  // 16
-    -4.0,    // 15
-    -3.667,  // 19
-    -3.333,  // 20
-    -3.0,    // 24
-    -2.667,  // 23
-    -2.333,  // 27
-    -2.0,    // 28
-    -1.667,  // 2
-    -1.333,  // 31
-    -1.0,    // 1
-    -0.667,  // 6
-    -0.333,  // 10
-    0.0,     // 5
-    0.333,   // 9
-    0.667,   // 14
-    1.0,     // 18
-    1.333,   // 13
-    1.667,   // 17
-    2.333,   // 22
-    3.333,   // 21
-    4.667,   // 26
-    7.0,     // 25
-    10.333,  // 30
-    15.0     // 29
+  -25.0,    // 0
+  -15.639,  // 3
+  -11.310,  // 4
+  -8.843,   // 7
+  -7.254,   // 8
+  -6.148,   // 11
+  -5.333,   // 12
+  -4.667,   // 16
+  -4.0,     // 15
+  -3.667,   // 19
+  -3.333,   // 20
+  -3.0,     // 24
+  -2.667,   // 23
+  -2.333,   // 27
+  -2.0,     // 28
+  -1.667,   // 2
+  -1.333,   // 31
+  -1.0,     // 1
+  -0.667,   // 6
+  -0.333,   // 10
+  0.0,      // 5
+  0.333,    // 9
+  0.667,    // 14
+  1.0,      // 18
+  1.333,    // 13
+  1.667,    // 17
+  2.333,    // 22
+  3.333,    // 21
+  4.667,    // 26
+  7.0,      // 25
+  10.333,   // 30
+  15.0      // 29
 };
 
 constexpr float AZ_RESOLUTION_300RPM = 0.1;
@@ -86,19 +86,20 @@ constexpr float AZ_RESOLUTION_1200RPM = 0.4;
 
 struct EL_TABLE
 {
-   constexpr EL_TABLE() : values()
-   {
-      for (auto i = 0; i < 32; ++i) {
-         values[i] = std::tan(el[i]*M_PI/180);
-      }
-   }
+  constexpr EL_TABLE() : values()
+  {
+    for (auto i = 0; i < 32; ++i)
+    {
+      values[i] = std::tan(el[i] * M_PI / 180);
+    }
+  }
 
-   int values[32];
+  int values[32];
 };
 
 constexpr EL_TABLE EL_TAN = EL_TABLE();
 
-} // namespace UltraPuckV2
-} // namespace BipedLab
+}  // namespace UltraPuckV2
+}  // namespace BipedLab
 
 #endif
