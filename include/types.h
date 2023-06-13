@@ -34,7 +34,8 @@
 
 
 namespace BipedLab {
-	typedef velodyne_pointcloud::PointXYZIR PointXYZRI;
+	using PointXYZIRT = velodyne_pcl::PointXYZIRT;
+
 	typedef struct QuickDecodeEntry {
 		uint64_t rcode;   // the queried code
 		uint16_t id;      // the tag id (a small integer)
@@ -48,15 +49,15 @@ namespace BipedLab {
 	}QuickDecode_t;
 
 	typedef struct PayloadVoting{
-		PointXYZRI *p;
+		PointXYZIRT *p;
 		float weight;
 		int cell;
-		PointXYZRI centroid;
+		PointXYZIRT centroid;
 	}PayloadVoting_t;
 
 
-	// velodyne_pointcloud::PointXYZIR operator+ (const PointXYZRI& p1, const PointXYZRI p2) {
-	//         PointXYZRI tmp;
+	// velodyne_pointcloud::PointXYZIRT operator+ (const PointXYZIRT& p1, const PointXYZIRT p2) {
+	//         PointXYZIRT tmp;
 	//         tmp.x = p1.x + p2.x;
 	//         tmp.y = p1.y + p2.y;
 	//         tmp.z = p1.z + p2.z;
@@ -110,7 +111,7 @@ namespace BipedLab {
 
 	// Struture for LiDAR PointCloud with index
 	typedef struct LiDARPoints {
-		PointXYZRI point;
+		PointXYZIRT point;
 		int index;
 		int valid;
 		double tag_size; // only take abs value due to uncertain direction 
@@ -180,18 +181,18 @@ namespace BipedLab {
 		int valid;
 		int top_ring;
 		int bottom_ring;
-		PointXYZRI top_most_point;
-		PointXYZRI bottom_most_point;
+		PointXYZIRT top_most_point;
+		PointXYZIRT bottom_most_point;
 
-		PointXYZRI front_most_point;
-		PointXYZRI back_most_point;
+		PointXYZIRT front_most_point;
+		PointXYZIRT back_most_point;
 
-		PointXYZRI right_most_point;
-		PointXYZRI left_most_point;
+		PointXYZIRT right_most_point;
+		PointXYZIRT left_most_point;
 
-		PointXYZRI average; // Average point
-		PointXYZRI max_intensity; // Maximux intensity point
-		PointXYZRI min_intensity; // Minimum intensity point
+		PointXYZIRT average; // Average point
+		PointXYZIRT max_intensity; // Maximux intensity point
+		PointXYZIRT min_intensity; // Minimum intensity point
 		pcl::PointCloud<LiDARPoints_t> data;     //data doesn't have edge points
 		pcl::PointCloud<LiDARPoints_t> edge_points;
 		pcl::PointCloud<LiDARPoints_t> transformed_edge_points;

@@ -49,20 +49,20 @@ namespace BipedLab {
         if (cluster_buff.size()==0){
             int bottom_ring = point.point.ring;
             int top_ring = point.point.ring;
-            PointXYZRI top_most_point = point.point;
+            PointXYZIRT top_most_point = point.point;
             top_most_point.z = top_most_point.z + _linkage_threshold;
-            PointXYZRI bottom_most_point = point.point;
+            PointXYZIRT bottom_most_point = point.point;
             bottom_most_point.z -= _linkage_threshold;
 
-            PointXYZRI front_most_point = point.point;
+            PointXYZIRT front_most_point = point.point;
             front_most_point.x += _linkage_threshold;
 
-            PointXYZRI back_most_point = point.point;
+            PointXYZIRT back_most_point = point.point;
             back_most_point.x -= _linkage_threshold;
 
-            PointXYZRI right_most_point = point.point;
+            PointXYZIRT right_most_point = point.point;
             right_most_point.y -= _linkage_threshold;
-            PointXYZRI left_most_point = point.point;
+            PointXYZIRT left_most_point = point.point;
             left_most_point.y += _linkage_threshold;
             //cout << "_linkage_threshold:" << _linkage_threshold << endl;
             //
@@ -122,19 +122,19 @@ namespace BipedLab {
                 int top_ring = point.point.ring;
                 int bottom_ring = point.point.ring;
 
-                PointXYZRI top_most_point = point.point;
+                PointXYZIRT top_most_point = point.point;
                 top_most_point.z += _linkage_threshold;
-                PointXYZRI bottom_most_point = point.point;
+                PointXYZIRT bottom_most_point = point.point;
                 bottom_most_point.z -= _linkage_threshold;
 
-                PointXYZRI front_most_point = point.point;
+                PointXYZIRT front_most_point = point.point;
                 front_most_point.x += _linkage_threshold;
-                PointXYZRI back_most_point = point.point;
+                PointXYZIRT back_most_point = point.point;
                 back_most_point.x -= _linkage_threshold;
 
-                PointXYZRI right_most_point = point.point;
+                PointXYZIRT right_most_point = point.point;
                 right_most_point.y -= _linkage_threshold;
-                PointXYZRI left_most_point = point.point;
+                PointXYZIRT left_most_point = point.point;
                 left_most_point.y += _linkage_threshold;
 
                 //cout << "TopMost: " << top_most_point.x << ", " << top_most_point.y << ", " << top_most_point.z << endl;

@@ -50,8 +50,11 @@
 
 namespace BipedLab {
 
-//typedef velodyne_pointcloud::PointXYZIR PointXYZRI;
+
 namespace utils {
+
+using PointXYZIRT = BipedLab::PointXYZIRT;
+
 double spendCPUTime(const std::clock_t &t_end, const std::clock_t &t_start);
 double spendCPUHz(const std::clock_t &t_end, const std::clock_t &t_start);
 double printSpendCPUHz(
@@ -135,7 +138,7 @@ Eigen::Vector3f rotationMatrixToEulerAngles(Eigen::Matrix3f &t_R);
 
 
 bool checkParameters(int t_n, ...);
-void COUT(const velodyne_pointcloud::PointXYZIR& t_p);
+void COUT(const PointXYZIRT& t_p);
 bool compareIndex(LiDARPoints_t *A, LiDARPoints_t *B);
 uint64_t bitShift(std::string const& t_value);
 
@@ -148,26 +151,26 @@ void normalize(std::vector<float> &t_x, std::vector<float> &t_y,
         std::vector<float> &t_z, std::vector<float> &t_I, 
         const pcl::PointCloud<LiDARPoints_t*> t_payload);
 
-velodyne_pointcloud::PointXYZIR pointsAddDivide (
-        const velodyne_pointcloud::PointXYZIR& t_p1, 
-        const velodyne_pointcloud::PointXYZIR& t_p2, float t_d=1);
+PointXYZIRT pointsAddDivide (
+        const PointXYZIRT& t_p1, 
+        const PointXYZIRT& t_p2, float t_d=1);
 
-velodyne_pointcloud::PointXYZIR vectorize (
-        const velodyne_pointcloud::PointXYZIR& t_p1, 
-        const velodyne_pointcloud::PointXYZIR& t_p2);
+PointXYZIRT vectorize (
+        const PointXYZIRT& t_p1, 
+        const PointXYZIRT& t_p2);
 
-float dot (const velodyne_pointcloud::PointXYZIR& t_p1, 
-           const velodyne_pointcloud::PointXYZIR& t_p2);
+float dot (const PointXYZIRT& t_p1, 
+           const PointXYZIRT& t_p2);
 
-float Norm (const velodyne_pointcloud::PointXYZIR& t_p);
+float Norm (const PointXYZIRT& t_p);
 
 // a function to determine the step of given two points
-float getStep(const velodyne_pointcloud::PointXYZIR &t_p1, 
-        const velodyne_pointcloud::PointXYZIR &t_p2, const int t_d);
+float getStep(const PointXYZIRT &t_p1, 
+        const PointXYZIRT &t_p2, const int t_d);
 
-void getProjection(const velodyne_pointcloud::PointXYZIR &t_p1, 
-        const velodyne_pointcloud::PointXYZIR &t_p2, 
-        const velodyne_pointcloud::PointXYZIR &t_p,
+void getProjection(const PointXYZIRT &t_p1, 
+        const PointXYZIRT &t_p2, 
+        const PointXYZIRT &t_p,
         float &t_k, Eigen::Vector2f &t_v);
 
 double MVN(const float &t_tag_size, const int &t_d,
@@ -175,33 +178,33 @@ double MVN(const float &t_tag_size, const int &t_d,
 
 void assignCellIndex(const float &t_tag_size,
         const Eigen::Matrix3f &t_R, 
-        velodyne_pointcloud::PointXYZIR &t_p_reference,
-        const velodyne_pointcloud::PointXYZIR &t_average,
+        PointXYZIRT &t_p_reference,
+        const PointXYZIRT &t_average,
         const int t_d, PayloadVoting_t &t_vote);
 
 void sortPointsToGrid(std::vector<std::vector<PayloadVoting_t*>> &t_grid, 
                       std::vector<PayloadVoting_t> &t_votes);
 
-Eigen::Vector2f pointToLine(const velodyne_pointcloud::PointXYZIR &t_p1, 
-        const velodyne_pointcloud::PointXYZIR &t_p2, 
-        const velodyne_pointcloud::PointXYZIR &t_p);
+Eigen::Vector2f pointToLine(const PointXYZIRT &t_p1, 
+        const PointXYZIRT &t_p2, 
+        const PointXYZIRT &t_p);
 
 void formGrid(Eigen::MatrixXf &t_vertices, 
         float t_x, float t_y, float t_z, float t_tag_size);
 
 void fitGrid(Eigen::MatrixXf &t_vertices, 
         Eigen::Matrix3f &t_R,
-        const velodyne_pointcloud::PointXYZIR &t_p1,   
-        const velodyne_pointcloud::PointXYZIR &t_p2, 
-        const velodyne_pointcloud::PointXYZIR &t_p3, 
-        const velodyne_pointcloud::PointXYZIR &t_p4);
+        const PointXYZIRT &t_p1,   
+        const PointXYZIRT &t_p2, 
+        const PointXYZIRT &t_p3, 
+        const PointXYZIRT &t_p4);
 
 void fitGrid_new(Eigen::MatrixXf &t_vertices, Eigen::Matrix3f &H,
              Eigen::MatrixXf &t_payload_vertices);
 
 float distance(
-        const velodyne_pointcloud::PointXYZIR &t_p1,
-        const velodyne_pointcloud::PointXYZIR &t_p2);
+        const PointXYZIRT &t_p1,
+        const PointXYZIRT &t_p2);
 template <class T, class U>
 float getAngle (T a, U b);
 double get_sign(double x);
@@ -219,15 +222,15 @@ Log_SO3(const Eigen::Matrix3f t_A);
 
 int checkCorners(
         const float t_tag_size,
-        const velodyne_pointcloud::PointXYZIR &t_p1,
-        const velodyne_pointcloud::PointXYZIR &t_p2,
-        const velodyne_pointcloud::PointXYZIR &t_p3,
-        const velodyne_pointcloud::PointXYZIR &t_p4);
+        const PointXYZIRT &t_p1,
+        const PointXYZIRT &t_p2,
+        const PointXYZIRT &t_p3,
+        const PointXYZIRT &t_p4);
 
-velodyne_pointcloud::PointXYZIR toVelodyne(const Eigen::Vector3f &t_p);
-Eigen::Vector3f toEigen(const velodyne_pointcloud::PointXYZIR &t_point);
-void minus(velodyne_pointcloud::PointXYZIR &t_p1, 
-           const velodyne_pointcloud::PointXYZIR &t_p2);
+PointXYZIRT toVelodyne(const Eigen::Vector3f &t_p);
+Eigen::Vector3f toEigen(const PointXYZIRT &t_point);
+void minus(PointXYZIRT &t_p1, 
+           const PointXYZIRT &t_p2);
 
 template <class T>
 T blockMatrix(int t_n, ...);
@@ -289,7 +292,7 @@ void removeIndicesFromVector(C<T>& c, std::vector<int>& rm) {
 }
 
 std::vector<int> complementOfSet(const std::vector<int>& set, std::size_t n);
-// std::ostream& operator<<(std::ostream& os, const velodyne_pointcloud::PointXYZIR& p);
+// std::ostream& operator<<(std::ostream& os, const PointXYZIRT& p);
 float dot_product(Eigen::Vector3f v1, Eigen::Vector3f v2);
 
 Eigen::Vector3f cross_product(Eigen::Vector3f v1, Eigen::Vector3f v2);

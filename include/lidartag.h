@@ -303,38 +303,38 @@ namespace BipedLab{
              * WhichPublisher should be a string of "organized" or "original" 
              * regardless lowercase and uppercase
              */
-            void _publishPC(const pcl::PointCloud<PointXYZRI>::Ptr &t_source_PC, 
+            void _publishPC(const pcl::PointCloud<PointXYZIRT>::Ptr &t_source_PC, 
                             const std::string &t_frame_name, 
                             std::string t_which_publisher);
 
             /* [Type transformation]
              * A function to transform from a customized type (LiDARpoints_t) of vector of 
-             * vector (EdgeBuff) into a standard type (PointXYZRI) of pcl vector (out)
+             * vector (EdgeBuff) into a standard type (PointXYZIRT) of pcl vector (out)
              */
             void _buffToPclVector(const std::vector<std::vector<LiDARPoints_t>> &t_edge_buff,
-                                 pcl::PointCloud<PointXYZRI>::Ptr t_out);
+                                 pcl::PointCloud<PointXYZIRT>::Ptr t_out);
 
             /* [Pre-Processing] 
              * A function to slice the Veloydyne full points to sliced pointed
              * based on ring number
              */
-            inline void _fillInOrderedPC(const pcl::PointCloud<PointXYZRI>::Ptr    &t_pcl_pointcloud, 
+            inline void _fillInOrderedPC(const pcl::PointCloud<PointXYZIRT>::Ptr    &t_pcl_pointcloud, 
                                          std::vector< std::vector<LiDARPoints_t> > &t_ordered_buff);
             /* 
             * A function to compute angle between the line from origin to this point 
             * and z=0 plane in lidar
             * */
-            float _getAnglefromPt(PointXYZRI &t_point);
+            float _getAnglefromPt(PointXYZIRT &t_point);
 
             void _getAngleVector(
-                        const pcl::PointCloud<PointXYZRI>::Ptr &pcl_pointcloud,
+                        const pcl::PointCloud<PointXYZIRT>::Ptr &pcl_pointcloud,
                         std::vector<float> &angles);
             /* [Type transformation]
              * A function to get pcl OrderedBuff from a ros sensor-msgs form of
              * pointcould queue
              */
             std::vector<std::vector<LiDARPoints_t>> _getOrderBuff();
-            // void GetOrderBuff(std::vector<std::vector<PointXYZRI>>& OrderedBuff);
+            // void GetOrderBuff(std::vector<std::vector<PointXYZIRT>>& OrderedBuff);
 
 
             /* [LiDAR analysis]
@@ -373,7 +373,7 @@ namespace BipedLab{
              * Given lidar pointcloud, this function performs 
              * lidartag detection and decode the corresponding id
              */
-            pcl::PointCloud<PointXYZRI>::Ptr
+            pcl::PointCloud<PointXYZIRT>::Ptr
             _lidarTagDetection(const std::vector<std::vector<LiDARPoints_t>> &t_ordered_buff, 
                                std::vector<ClusterFamily_t> &t_cluster_buff);
 
@@ -524,12 +524,12 @@ namespace BipedLab{
             /* [Type transformation]
              * A function to transform an eigen type of vector to pcl point type
              */
-            void _eigenVectorToPointXYZRI(const Eigen::Vector4f &t_vector, PointXYZRI &t_point);
+            void _eigenVectorToPointXYZIRT(const Eigen::Vector4f &t_vector, PointXYZIRT &t_point);
 
             /* [Type transformation]
              * A function to transform a pcl point type to an eigen vector
              */
-            void _PointXYZRIToEigenVector(const PointXYZRI &point, Eigen::Vector4f &Vector);
+            void _PointXYZIRTToEigenVector(const PointXYZIRT &point, Eigen::Vector4f &Vector);
 
 
             /* [Normal vector]
@@ -556,7 +556,7 @@ namespace BipedLab{
              */
 			void _tagToRobot(const int &t_cluster_id, const Eigen::Vector3f &t_normal_vec, 
                              Homogeneous_t &t_pose, 
-							 tf::Transform &t_transform, const PointXYZRI &t_ave);
+							 tf::Transform &t_transform, const PointXYZIRT &t_ave);
 
 
             /* [Payload decoding]
@@ -585,7 +585,7 @@ namespace BipedLab{
              */
             int _getCodeWeightedGaussian(std::string &Code, Homogeneous_t &t_pose,
                                          int &t_payload_points,
-                                         const PointXYZRI &ave, 
+                                         const PointXYZIRT &ave, 
                                          const pcl::PointCloud<LiDARPoints_t*> &t_payload, 
                                          const std::vector<LiDARPoints_t*> &t_payload_boundary_ptr);
 
@@ -785,21 +785,21 @@ namespace BipedLab{
              * A function to prepare for visualization results in rviz
              */
             void _clusterToPclVectorAndMarkerPublisher(const std::vector<ClusterFamily_t> &t_cluster,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_out_cluster,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_out_edge_cluster,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_out_payload,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_out_payload3d,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_out_target,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_ini_out_target,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_edge1,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_edge2,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_edge3,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_edge4,
-                                                       pcl::PointCloud<PointXYZRI>::Ptr t_boundary_pts,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_out_cluster,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_out_edge_cluster,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_out_payload,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_out_payload3d,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_out_target,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_ini_out_target,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_edge1,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_edge2,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_edge3,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_edge4,
+                                                       pcl::PointCloud<PointXYZIRT>::Ptr t_boundary_pts,
                                                        visualization_msgs::MarkerArray &t_marker_array);
             void _plotIdealFrame();
             void _plotTagFrame(const ClusterFamily_t &t_cluster);
-            visualization_msgs::Marker _visualizeVector(Eigen::Vector3f edge_vector, PointXYZRI centriod, int t_ID);
+            visualization_msgs::Marker _visualizeVector(Eigen::Vector3f edge_vector, PointXYZIRT centriod, int t_ID);
             /* [accumulating temporal cluster]
             * A function to save temporal clusters data
             */
@@ -821,7 +821,7 @@ namespace BipedLab{
                              visualization_msgs::MarkerArray t_mark_array,
                              const uint32_t shape, const std::string ns,
                              const double r, const double g, const double b,
-                             const PointXYZRI t_point1, const PointXYZRI t_point2, 
+                             const PointXYZIRT t_point1, const PointXYZIRT t_point2, 
                              const int t_count);
 
 
@@ -831,13 +831,13 @@ namespace BipedLab{
             void _assignMarker(visualization_msgs::Marker &t_marker, const uint32_t t_shape, 
                                const std::string t_namespace,
                                const double r, const double g, const double b,
-                               const PointXYZRI &t_point, const int t_count, 
+                               const PointXYZIRT &t_point, const int t_count, 
                                const double t_size, const std::string Text="");
 
             void _assignVectorMarker(visualization_msgs::Marker &t_marker, const uint32_t t_shape, 
                                const std::string t_namespace,
                                const double r, const double g, const double b,
-                               const int t_count, const double t_size, Eigen::Vector3f t_edge_vector, const PointXYZRI &t_centriod, 
+                               const int t_count, const double t_size, Eigen::Vector3f t_edge_vector, const PointXYZIRT &t_centriod, 
                                const std::string Text="");
 
             void _printStatistics(

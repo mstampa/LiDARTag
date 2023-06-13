@@ -45,7 +45,7 @@ namespace BipedLab {
      */
     void LiDARTag::_assignMarker(visualization_msgs::Marker &Marker, const uint32_t Shape, const string NameSpace,
                                const double r, const double g, const double b,
-                               const PointXYZRI &point, 
+                               const PointXYZIRT &point, 
                                const int Count, const double Size, const string Text){
         Marker.header.frame_id = _pub_frame;
         Marker.header.stamp = _current_scan_time;
@@ -77,13 +77,13 @@ namespace BipedLab {
 
     void LiDARTag::_assignVectorMarker(visualization_msgs::Marker &Marker, const uint32_t Shape, const string NameSpace,
                                const double r, const double g, const double b,
-                               const int Count, const double Size, Eigen::Vector3f edge_vector, const PointXYZRI &centriod, const string Text){
+                               const int Count, const double Size, Eigen::Vector3f edge_vector, const PointXYZIRT &centriod, const string Text){
         // LiDARTag::_assignMarker(Marker, visualization_msgs::Marker::SPHERE, NameSpace,
         //              r, g, b,
         //              centriod, 
         //              Count, Size, Text);
 
-        // PointXYZRI p2;
+        // PointXYZIRT p2;
         // p2.x = centriod.x + edge_vector[0];
         // p2.y = centriod.y + edge_vector[1];
         // p2.z = centriod.z + edge_vector[2]; 
@@ -260,7 +260,7 @@ namespace BipedLab {
     visualization_msgs::Marker 
     LiDARTag::_visualizeVector(
             Eigen::Vector3f edge_vector, 
-            PointXYZRI centriod, 
+            PointXYZIRT centriod, 
             int ID){
         visualization_msgs::Marker edge;
         edge.id = ID;
@@ -289,17 +289,17 @@ namespace BipedLab {
      * A function to prepare for displaying results in rviz
      */
     void LiDARTag::_clusterToPclVectorAndMarkerPublisher(const std::vector<ClusterFamily_t> &Cluster,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutCluster,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutEdgeCluster,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutPayload,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutPayload3D, 
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutTarget,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr OutInitialTarget,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr EdgeGroup1,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr EdgeGroup2,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr EdgeGroup3,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr EdgeGroup4,
-                                                        pcl::PointCloud<PointXYZRI>::Ptr BoundaryPts,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutCluster,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutEdgeCluster,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutPayload,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutPayload3D, 
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutTarget,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr OutInitialTarget,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr EdgeGroup1,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr EdgeGroup2,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr EdgeGroup3,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr EdgeGroup4,
+                                                        pcl::PointCloud<PointXYZIRT>::Ptr BoundaryPts,
                                                         visualization_msgs::MarkerArray &ClusterArray){
 
         /* initialize random seed for coloring the marker*/
@@ -763,7 +763,7 @@ namespace BipedLab {
             // corner points and RANSAC line
             if (_adaptive_thresholding){
                 Eigen::Vector4f EigenPoint;
-                PointXYZRI point; // just for conversion
+                PointXYZIRT point; // just for conversion
 
                 for (int i=0; i<4; ++i){ // 4 corners
                     // Corners
@@ -776,7 +776,7 @@ namespace BipedLab {
                                                       EigenPoint, 1e-2);
                     }
 
-                    LiDARTag::_eigenVectorToPointXYZRI(EigenPoint, point);
+                    LiDARTag::_eigenVectorToPointXYZIRT(EigenPoint, point);
                     LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::SPHERE, 
                                           "Corner_" + to_string(Cluster[Key].cluster_id), 
                                           0, 1, 1,
@@ -860,7 +860,7 @@ namespace BipedLab {
             //     if (Cluster[Key].data[i].valid != 1) continue;
             //     Eigen::Vector4f p(Cluster[Key].data[i].point.x, Cluster[Key].data[i].point.y, Cluster[Key].data[i].point.z, 1);
             //     Eigen::Vector4f tp = Cluster[Key].ini_pose.homogeneous * p;
-            //     PointXYZRI point;
+            //     PointXYZIRT point;
             //     point.x = tp[0];
             //     point.y = tp[1];
             //     point.z = tp[2];
@@ -874,7 +874,7 @@ namespace BipedLab {
             //     if (Cluster[Key].edge_points[i].valid != 1) continue;
             //     Eigen::Vector4f p(Cluster[Key].edge_points[i].point.x, Cluster[Key].edge_points[i].point.y, Cluster[Key].edge_points[i].point.z, 1);
             //     Eigen::Vector4f tp = Cluster[Key].ini_pose.homogeneous * p;
-            //     PointXYZRI point;
+            //     PointXYZIRT point;
             //     point.x = tp[0];
             //     point.y = tp[1];
             //     point.z = tp[2];
@@ -887,7 +887,7 @@ namespace BipedLab {
             // ROS_INFO_STREAM("cols: " << Cluster[Key].rkhs_decoding.template_points_3d.cols());
             if (_id_decoding) {
                 for (int i=0; i<Cluster[Key].rkhs_decoding.associated_pattern_3d->cols(); ++i){
-                    PointXYZRI point;
+                    PointXYZIRT point;
                     point.x = Cluster[Key].rkhs_decoding.associated_pattern_3d->col(i)(0);
                     point.y = Cluster[Key].rkhs_decoding.associated_pattern_3d->col(i)(1);
                     point.z = Cluster[Key].rkhs_decoding.associated_pattern_3d->col(i)(2);
@@ -900,7 +900,7 @@ namespace BipedLab {
                     OutPayload->push_back(point);
                 }
                 for (int i=0; i<Cluster[Key].rkhs_decoding.template_points_3d.cols(); ++i){
-                    PointXYZRI point;
+                    PointXYZIRT point;
                     point.x = Cluster[Key].rkhs_decoding.template_points_3d.col(i)(0);
                     point.y = Cluster[Key].rkhs_decoding.template_points_3d.col(i)(1);
                     point.z = Cluster[Key].rkhs_decoding.template_points_3d.col(i)(2);
@@ -911,7 +911,7 @@ namespace BipedLab {
             if (_mark_cluster_validity) {
 
                 for (int i=0; i<Cluster[Key].rkhs_decoding.initial_template_points.cols(); ++i){
-                    PointXYZRI point;
+                    PointXYZIRT point;
                     point.x = Cluster[Key].rkhs_decoding.initial_template_points.col(i)(0);
                     point.y = Cluster[Key].rkhs_decoding.initial_template_points.col(i)(1);
                     point.z = Cluster[Key].rkhs_decoding.initial_template_points.col(i)(2);
@@ -919,7 +919,7 @@ namespace BipedLab {
                     OutInitialTarget->push_back(point);
                 }
                 for (int i=0; i<Cluster[Key].rkhs_decoding.template_points.cols(); ++i){
-                    PointXYZRI point;
+                    PointXYZIRT point;
                     point.x = Cluster[Key].rkhs_decoding.template_points.col(i)(0);
                     point.y = Cluster[Key].rkhs_decoding.template_points.col(i)(1);
                     point.z = Cluster[Key].rkhs_decoding.template_points.col(i)(2);

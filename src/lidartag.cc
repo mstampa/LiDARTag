@@ -243,30 +243,30 @@ namespace BipedLab {
         //ros::Rate r(10); // 10 hz
         ros::Duration duration(_sleep_time_for_vis);
         clock_t StartAve = clock();
-        pcl::PointCloud<PointXYZRI>::Ptr clusterpc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr clusteredgepc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr payloadpc(
-                new pcl::PointCloud<PointXYZRI>);
-        // pcl::PointCloud<PointXYZRI>::Ptr indexpc(
-        //         new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr boundarypc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr tagpc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr ini_tagpc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr payload3dpc(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr edge_group1(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr edge_group2(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr edge_group3(
-                new pcl::PointCloud<PointXYZRI>);
-        pcl::PointCloud<PointXYZRI>::Ptr edge_group4(
-                new pcl::PointCloud<PointXYZRI>);
+        pcl::PointCloud<PointXYZIRT>::Ptr clusterpc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr clusteredgepc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr payloadpc(
+                new pcl::PointCloud<PointXYZIRT>);
+        // pcl::PointCloud<PointXYZIRT>::Ptr indexpc(
+        //         new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr boundarypc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr tagpc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr ini_tagpc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr payload3dpc(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr edge_group1(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr edge_group2(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr edge_group3(
+                new pcl::PointCloud<PointXYZIRT>);
+        pcl::PointCloud<PointXYZIRT>::Ptr edge_group4(
+                new pcl::PointCloud<PointXYZIRT>);
         clusterpc->reserve(_point_cloud_size);
         clusteredgepc->reserve(_point_cloud_size);
         // indexpc->reserve(_point_cloud_size);
@@ -285,9 +285,12 @@ namespace BipedLab {
         
         // std::vector<std::vector<pcl::PointCloud<LiDARPoints_t>>> matData;
         //_thread_vec = std::make_shared<ThreadPool>(_num_threads);
-         tbb::task_scheduler_init tbb_init(_num_threads);
+        // tbb is never used :/
+        //tbb::task_scheduler_init tbb_init(_num_threads);
         // _thread_vec(_num_threads);
         // ROS_INFO_STREAM("")
+
+
 
         int curr_frame = 0;
         int frame_of_interest = 9;
@@ -347,7 +350,7 @@ namespace BipedLab {
             // A vector of clusters
             std::vector<ClusterFamily_t> clusterbuff; 
             
-            pcl::PointCloud<PointXYZRI>::Ptr extracted_poi_pc = 
+            pcl::PointCloud<PointXYZIRT>::Ptr extracted_poi_pc = 
                 LiDARTag::_lidarTagDetection(ordered_buff, clusterbuff);
             
 
@@ -757,8 +760,8 @@ namespace BipedLab {
         _current_scan_time = msg->header.stamp;
 
         // Convert to sensor_msg to pcl type
-        pcl::PointCloud<PointXYZRI>::Ptr 
-            pcl_pointcloud(new pcl::PointCloud<PointXYZRI>);
+        pcl::PointCloud<PointXYZIRT>::Ptr 
+            pcl_pointcloud(new pcl::PointCloud<PointXYZIRT>);
         pcl::fromROSMsg(*msg, *pcl_pointcloud);
 
 
@@ -1017,7 +1020,7 @@ namespace BipedLab {
      * which_publisher should be a string of "organized" or "original" 
      * regardless lowercase and uppercase
      */
-	void LiDARTag::_publishPC(const pcl::PointCloud<PointXYZRI>::Ptr &source_pc, 
+	void LiDARTag::_publishPC(const pcl::PointCloud<PointXYZIRT>::Ptr &source_pc, 
                               const std::string &frame, string which_publisher){
         utils::tranferToLowercase(which_publisher); // check letter cases
 		sensor_msgs::PointCloud2 pcs_waited_to_pub;      
@@ -1109,7 +1112,7 @@ namespace BipedLab {
      * */
 	inline
     void LiDARTag::_fillInOrderedPC(
-            const pcl::PointCloud<PointXYZRI>::Ptr &pcl_pointcloud, 
+            const pcl::PointCloud<PointXYZIRT>::Ptr &pcl_pointcloud, 
             std::vector<std::vector<LiDARPoints_t>>& ordered_buff) {
         if (!_has_ring && _ring_estimated) {
             std::string ring_list;
@@ -1172,7 +1175,7 @@ namespace BipedLab {
      * A function to compute angle between the line from origin to this point 
      * and z=0 plane in lidar
      * */
-    float LiDARTag::_getAnglefromPt(PointXYZRI &point) {
+    float LiDARTag::_getAnglefromPt(PointXYZIRT &point) {
         float distance = std::sqrt(std::pow(point.x, 2) + std::pow(point.y, 2));
         float theta = utils::rad2Deg(std::atan2(point.z, distance));
 
@@ -1181,7 +1184,7 @@ namespace BipedLab {
     }
 
     void LiDARTag::_getAngleVector(
-            const pcl::PointCloud<PointXYZRI>::Ptr &pcl_pointcloud,
+            const pcl::PointCloud<PointXYZIRT>::Ptr &pcl_pointcloud,
             std::vector<float> &angles) {
         for (auto && p : *pcl_pointcloud) {
             if (p.x == 0 && p.y == 0 && p.z == 0) {
@@ -1201,7 +1204,7 @@ namespace BipedLab {
     /*
      * Main function 
      */
-	pcl::PointCloud<PointXYZRI>::Ptr
+	pcl::PointCloud<PointXYZIRT>::Ptr
 	LiDARTag::_lidarTagDetection(
             const std::vector<std::vector<LiDARPoints_t>>& ordered_buff, 
             std::vector<ClusterFamily_t> &cluster_buff){
@@ -1211,7 +1214,7 @@ namespace BipedLab {
         else
             ROS_DEBUG_STREAM("--------------- Begining ---------------");
 
-		pcl::PointCloud<PointXYZRI>::Ptr out(new pcl::PointCloud<PointXYZRI>);
+		pcl::PointCloud<PointXYZIRT>::Ptr out(new pcl::PointCloud<PointXYZIRT>);
 		out->reserve(_point_cloud_size);
 
         // Buff to store all detected edges
@@ -1432,7 +1435,7 @@ namespace BipedLab {
                 //                            (point.getVector3fMap()-PointR.getVector3fMap()).norm());
 
         // Remove all clusters with insufficient points
-        // pcl::PointCloud<PointXYZRI>::Ptr ClusterEdgePC(new pcl::PointCloud<PointXYZRI>);
+        // pcl::PointCloud<PointXYZIRT>::Ptr ClusterEdgePC(new pcl::PointCloud<PointXYZIRT>);
         // for (int i = 0; i < cluster_buff.size(); ++i)
         // {
         //    if (cluster_buff[i].data.size() >= std::sqrt(_tag_family)*2)
@@ -1746,7 +1749,7 @@ namespace BipedLab {
 
         // Collect histogram data of cluster
         // ofstream clusterHist("/home/cassie/catkin_ws/src/LiDARTag/output/hist.txt");
-        // pcl::PointCloud<PointXYZRI>::Ptr ClusterEdgePC(new pcl::PointCloud<PointXYZRI>);
+        // pcl::PointCloud<PointXYZIRT>::Ptr ClusterEdgePC(new pcl::PointCloud<PointXYZIRT>);
         // for (int i = 0; i < cluster_buff.size(); ++i) {
         //     if (!cluster_buff[i].valid) {
         //         continue;
@@ -2084,7 +2087,7 @@ namespace BipedLab {
         //     Eigen::Vector4f p(cluster.data[i].point.x, cluster.data[i].point.y, cluster.data[i].point.z, 1);
         //     Eigen::Vector4f tp = cluster.initial_pose.homogeneous * p;
         //     Eigen::
-        //     // PointXYZRI point;
+        //     // PointXYZIRT point;
         //     // point.x = tp[0];
         //     // point.y = tp[1];
         //     // point.z = tp[2];
@@ -2097,7 +2100,7 @@ namespace BipedLab {
         //     if (cluster.edge_points[i].valid != 1) continue;
         //     Eigen::Vector4f p(cluster.edge_points[i].point.x, cluster.edge_points[i].point.y, cluster.edge_points[i].point.z, 1);
         //     Eigen::Vector4f tp = cluster.initial_pose.homogeneous * p;
-        //     PointXYZRI point;
+        //     PointXYZIRT point;
         //     point.x = tp[0];
         //     point.y = tp[1];
         //     point.z = tp[2];
@@ -2114,7 +2117,7 @@ namespace BipedLab {
             const int &cluster_id, 
             const Eigen::Vector3f &normal_vec, 
             Homogeneous_t &pose, 
-            tf::Transform &transform, const PointXYZRI &ave){
+            tf::Transform &transform, const PointXYZIRT &ave){
         Eigen::Vector3f x(1, 0, 0);
         Eigen::Vector3f y(0, 1, 0);
         Eigen::Vector3f z(0, 0, 1);
@@ -2294,7 +2297,7 @@ namespace BipedLab {
         for (int i = 0; i < cluster.edge_points.size(); ++i){
             if (cluster.edge_points[i].valid != 1) 
                 continue;
-            _PointXYZRIToEigenVector(cluster.edge_points[i].point, cur_vec);
+            _PointXYZIRTToEigenVector(cluster.edge_points[i].point, cur_vec);
             cluster.merged_data.col(eigenpc_index) = cur_vec;
             cluster.merged_data_h.col(eigenpc_index) << 
                 cur_vec(0), cur_vec(1), cur_vec(2), 1;
@@ -2325,7 +2328,7 @@ namespace BipedLab {
         for (int i=0; i < cluster.data.size(); ++i){
             if (cluster.data[i].valid != 1) 
                 continue;
-            _PointXYZRIToEigenVector(cluster.data[i].point, cur_vec);
+            _PointXYZIRTToEigenVector(cluster.data[i].point, cur_vec);
             cluster.merged_data.col(eigenpc_index) = cur_vec;
             cluster.merged_data_h.col(eigenpc_index) << 
                 cur_vec(0), cur_vec(1), cur_vec(2), 1;
@@ -2381,7 +2384,7 @@ namespace BipedLab {
 
 
         
-        // PointXYZRI average{0,0,0,0};
+        // PointXYZIRT average{0,0,0,0};
         // for (int k = 0; k < cluster.edge_points.size(); ++k) {
         //     if (cluster.edge_points[k].valid != 1) continue;
         //     average.x += cluster.edge_points[k].point.x;
@@ -2419,7 +2422,7 @@ namespace BipedLab {
      */
     void LiDARTag::_extractPayloadWOThreshold(ClusterFamily_t &cluster){
         int last_round_length = 0; // Save to recover a missing ring
-        PointXYZRI average{0,0,0,0};
+        PointXYZIRT average{0,0,0,0};
         for(int ring=0; ring<_beam_num; ++ring){
 
             // if (cluster.payload_right_boundary_ptr[ring]!=0)
@@ -2782,11 +2785,11 @@ namespace BipedLab {
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud3(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud4(new pcl::PointCloud<pcl::PointXYZ>);
 
-        pcl::PointCloud<PointXYZRI>::Ptr TransformedPC(new pcl::PointCloud<PointXYZRI>);
+        pcl::PointCloud<PointXYZIRT>::Ptr TransformedPC(new pcl::PointCloud<PointXYZIRT>);
         TransformedPC->reserve(_point_cloud_size);
         TransformedPC->clear();
 
-        pcl::PointCloud<PointXYZRI>::Ptr TransformedPCTag(new pcl::PointCloud<PointXYZRI>);
+        pcl::PointCloud<PointXYZIRT>::Ptr TransformedPCTag(new pcl::PointCloud<PointXYZIRT>);
         TransformedPCTag->reserve(_point_cloud_size);
         TransformedPCTag->clear();
 
@@ -2910,8 +2913,8 @@ namespace BipedLab {
         utils::fitGrid_new(Vertices, R, ordered_payload_vertices);
 
         // used for visualization for corner points
-        PointXYZRI showpoint;
-        PointXYZRI showpoint_tag;
+        PointXYZIRT showpoint;
+        PointXYZIRT showpoint_tag;
         for (int i = 0; i < 3; ++i) {
             showpoint.intensity = 50;
             showpoint.x = ordered_payload_vertices.col(i)(0);
@@ -3272,11 +3275,11 @@ namespace BipedLab {
     /* 
      * A function to transform from a customized type (LiDARpoints_t) 
      * of vector of vector (edge_buff) 
-     * into a standard type (PointXYZRI) of pcl vector (out)
+     * into a standard type (PointXYZIRT) of pcl vector (out)
      */
     void LiDARTag::_buffToPclVector(
             const std::vector<std::vector<LiDARPoints_t>> &edge_buff,
-                                 pcl::PointCloud<PointXYZRI>::Ptr Out){
+                                 pcl::PointCloud<PointXYZIRT>::Ptr Out){
         for (int ringnumber=0; ringnumber<_beam_num; ++ringnumber){
             if (edge_buff.at(ringnumber).size()!=0){
                 for (int i=0; i<edge_buff.at(ringnumber).size(); ++i){
@@ -3292,7 +3295,7 @@ namespace BipedLab {
     void LiDARTag::_assignLine(visualization_msgs::Marker &Marker, visualization_msgs::MarkerArray MarkArray,
                              const uint32_t Shape, const string ns,
                              const double r, const double g, const double b,
-                             const PointXYZRI point1, const PointXYZRI point2, const int count){
+                             const PointXYZIRT point1, const PointXYZIRT point2, const int count){
         Marker.header.frame_id = _pub_frame;
         Marker.header.stamp = _current_scan_time;
         //Marker.ns = string("Boundary_") + to_string(cluster.cluster_id);
@@ -3330,7 +3333,7 @@ namespace BipedLab {
     /*
      * A function to transform an eigen type of vector to pcl point type
      */
-    void LiDARTag::_eigenVectorToPointXYZRI(const Eigen::Vector4f &Vector, PointXYZRI &point){
+    void LiDARTag::_eigenVectorToPointXYZIRT(const Eigen::Vector4f &Vector, PointXYZIRT &point){
         point.x = Vector[0];
         point.y = Vector[1];
         point.z = Vector[2];
@@ -3340,7 +3343,7 @@ namespace BipedLab {
     /*
      * A function to transform a pcl point type to an eigen vector 
      */
-    void LiDARTag::_PointXYZRIToEigenVector(const PointXYZRI &point, Eigen::Vector4f &Vector){
+    void LiDARTag::_PointXYZIRTToEigenVector(const PointXYZIRT &point, Eigen::Vector4f &Vector){
         Vector[0] = point.x;
         Vector[1] = point.y;
         Vector[2] = point.z;
@@ -3790,7 +3793,7 @@ namespace BipedLab {
 
         detection.size = detection.id == 1? 1.215 : 0.8;
 
-        pcl::PointCloud<PointXYZRI>::Ptr clusterPC(new pcl::PointCloud<PointXYZRI>);
+        pcl::PointCloud<PointXYZIRT>::Ptr clusterPC(new pcl::PointCloud<PointXYZIRT>);
         for (int i=0; i<cluster.data.size(); ++i){
             clusterPC->push_back(cluster.data[i].point);
         }

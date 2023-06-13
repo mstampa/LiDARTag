@@ -48,15 +48,15 @@ void LiDARTag::_getCodeNaive(
         pcl::PointCloud<LiDARPoints_t*> payload){
     int topring = 0;
     int bottomring = _beam_num;
-    PointXYZRI tl= payload[0]->point;
-    PointXYZRI tr= payload[0]->point;
-    PointXYZRI br= payload[0]->point;
-    PointXYZRI bl= payload[0]->point;
+    PointXYZIRT tl= payload[0]->point;
+    PointXYZIRT tr= payload[0]->point;
+    PointXYZIRT br= payload[0]->point;
+    PointXYZIRT bl= payload[0]->point;
 
 
     // Find the size of the payload 
     for (int i=0; i<payload.size(); ++i){
-        PointXYZRI point = payload[i]->point;
+        PointXYZIRT point = payload[i]->point;
         if (point.y>tl.y && point.z>tl.z) tl = point;
         if (point.y>bl.y && point.z<bl.z) bl = point;
         if (point.y<tr.y && point.z>tr.z) tr = point;
@@ -111,7 +111,7 @@ void LiDARTag::_getCodeNaive(
 
     // Split into grids
     for (int i=0; i<payload.size(); ++i){
-        PointXYZRI *pointPtr = &(payload[i]->point);
+        PointXYZIRT *pointPtr = &(payload[i]->point);
         // cout << "i: " << i << endl;
         // cout << "point.y: " << pointPtr->y << endl;
         // cout << "point.z: " << pointPtr->z << endl;
@@ -185,7 +185,7 @@ void LiDARTag::_getCodeNaive(
  */
 int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
                         int &payload_points,
-                        const PointXYZRI &average, 
+                        const PointXYZIRT &average, 
                         const pcl::PointCloud<LiDARPoints_t*> &payload, 
                         const std::vector<LiDARPoints_t*> &payload_boundary_ptr){
     /*          p11
@@ -216,20 +216,20 @@ int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
 
 
 
-    PointXYZRI p11{0, 0, -1000, 0};
-    PointXYZRI p21{0, -1000, 0, 0};
-    PointXYZRI p31{0, 0, 1000, 0};
-    PointXYZRI p41{0, 1000, 0, 0};
+    PointXYZIRT p11{0, 0, -1000, 0};
+    PointXYZIRT p21{0, -1000, 0, 0};
+    PointXYZIRT p31{0, 0, 1000, 0};
+    PointXYZIRT p41{0, 1000, 0, 0};
 
-    PointXYZRI p12{0, 0, -1000, 0};
-    PointXYZRI p22{0, -1000, 0, 0};
-    PointXYZRI p32{0, 0, 1000, 0};
-    PointXYZRI p42{0, 1000, 0, 0};
+    PointXYZIRT p12{0, 0, -1000, 0};
+    PointXYZIRT p22{0, -1000, 0, 0};
+    PointXYZIRT p32{0, 0, 1000, 0};
+    PointXYZIRT p42{0, 1000, 0, 0};
 
 
     // Find the largest 
     for (int i=0; i<payload_boundary_ptr.size(); ++i){
-        PointXYZRI point = payload_boundary_ptr[i]->point;
+        PointXYZIRT point = payload_boundary_ptr[i]->point;
 
         if (point.z>=p11.z) p11 = point;
         if (point.y>=p21.y) p21 = point;
@@ -265,7 +265,7 @@ int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
 
     // Find the second large
     for (int i=0; i<payload_boundary_ptr.size(); ++i){
-        PointXYZRI point = payload_boundary_ptr[i]->point;
+        PointXYZIRT point = payload_boundary_ptr[i]->point;
         if (point.z<p11.z && point.z>=p12.z) p12 = point;
         if (point.y<p21.y && point.y>=p22.y) p22 = point;
 
@@ -299,10 +299,10 @@ int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
         GridMarkerArray.markers.push_back(GridMarker);
     }
 
-    PointXYZRI p1 = utils::pointsAddDivide(p11, p12, 2);
-    PointXYZRI p2 = utils::pointsAddDivide(p21, p22, 2);
-    PointXYZRI p3 = utils::pointsAddDivide(p31, p32, 2);
-    PointXYZRI p4 = utils::pointsAddDivide(p41, p42, 2);
+    PointXYZIRT p1 = utils::pointsAddDivide(p11, p12, 2);
+    PointXYZIRT p2 = utils::pointsAddDivide(p21, p22, 2);
+    PointXYZIRT p3 = utils::pointsAddDivide(p31, p32, 2);
+    PointXYZIRT p4 = utils::pointsAddDivide(p41, p42, 2);
 
     // check condition of the detected corners
     // if corners are not between certain angle or distance, 
@@ -316,7 +316,7 @@ int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
         p3 = {0, 0, 1000, 0};
         p4 = {0, 0,-1000, 0};
         for (int i=0; i<payload_boundary_ptr.size(); ++i){
-            PointXYZRI point = payload_boundary_ptr[i]->point;
+            PointXYZIRT point = payload_boundary_ptr[i]->point;
 
             // left boundary
             if (point.z>=p1.z && point.y > average.y/2) p1 = point;
@@ -449,11 +449,11 @@ int LiDARTag::_getCodeWeightedGaussian(string &Code, Homogeneous_t &pose,
     for (int i=0; i<payload.size(); ++i){
         float t14, t12;
         Eigen::Vector2f v14, v12;
-        PointXYZRI *pointPtr = &(payload[i]->point);
+        PointXYZIRT *pointPtr = &(payload[i]->point);
         utils::getProjection(p1, p4, *pointPtr, t14, v14);
         utils::getProjection(p1, p2, *pointPtr, t12, v12);
         Votes[i].p = pointPtr;
-        PointXYZRI p; // for visualization
+        PointXYZIRT p; // for visualization
         utils::assignCellIndex(_payload_size, R, p, 
                                average, d + 2*_black_border, Votes[i]);
         if(_grid_viz){
@@ -1052,7 +1052,6 @@ void LiDARTag::computeFunctionVectorInnerProductTBBThreadingNoScheduling(
     const Eigen::ArrayXf z_ary = pc2.row(2).array();
     const Eigen::ArrayXf i_ary = pc2.row(3).array();
 
-    // tbb::atomic<float> score_thread = 0;
     Eigen::VectorXf score_vec(num_pc1);
     tbb::parallel_for(int(0), num_pc1, [&](int i) {
          singleTask(x_ary, y_ary, z_ary, i_ary, pc1.col(i), 
@@ -1080,7 +1079,7 @@ void LiDARTag::computeFunctionVectorInnerProductTBBThreadingTBBScheduling(
     const Eigen::ArrayXf y_ary = pc2.row(1).array();
     const Eigen::ArrayXf z_ary = pc2.row(2).array();
     const Eigen::ArrayXf i_ary = pc2.row(3).array();
-    tbb::atomic<float> score_thread = 0;
+    std::atomic<float> score_thread = 0;
 
     Eigen::VectorXf score_vec(num_pc1);
     // std::vector<float> score_vec(num_pc1);
@@ -1226,7 +1225,7 @@ void LiDARTag::computeFunctionOriginalInnerProductKDTree(
 
     kd_tree_t mat_index(3 /*dim*/, std::cref(pc2_points), 10 /* max leaf */ );
     mat_index.index->buildIndex();
-    tbb::atomic<float> score_thread = 0;
+    std::atomic<float> score_thread = 0;
     //float score_tmp = 0;
     //score = 0;
     tbb::concurrent_vector<float> score_vec;
@@ -1251,7 +1250,7 @@ void LiDARTag::computeFunctionOriginalInnerProductKDTree(
                     -std::norm(feature1 - feature2) / (2 * std::pow(feature_ell, 2)));
             float geometry_kernel = geo_sig * std::exp( 
                     -(std::sqrt(dis_squared)) / (2 * std::pow(geo_ell, 2)));
-            // tbb::atomic<float> inner_prod = feature_kernel * geometry_kernel; 
+
             float inner_prod = feature_kernel * geometry_kernel; 
             // cout << "inner_prod: " << inner_prod << endl;
             if (inner_prod > sp_thres) 
