@@ -28,6 +28,10 @@
  * WEBSITE: https://www.brucerobot.com/
  */
 
+#include "lidartag.h"
+#include "apriltag_utils.h"
+#include "utils.h"
+#include "ultra_puck.h"
 
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/sample_consensus/sac_model_line.h>
@@ -41,27 +45,21 @@
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <ros/package.h>
+#include <ros/console.h>
 
 #include <Eigen/Dense> // SVD
 #include <unsupported/Eigen/MatrixFunctions> // matrix exponential
 #include <unsupported/Eigen/CXX11/Tensor> // tensor output
 
-#include <ros/package.h> // package
-#include <ros/console.h>
-
-#include "lidartag.h"
-#include "apriltag_utils.h"
-#include "utils.h"
-#include "ultra_puck.h"
-
-#include <unistd.h>
 #include <algorithm>    // std::sort
-#include <math.h>        /* sqrt, pow(a,b) */
-#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
-#include <thread>
-#include <stdlib.h>     /* srand, rand */
 #include <fstream> // log files
+#include <math.h>        /* sqrt, pow(a,b) */
 #include <nlopt.hpp>
+#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
+#include <stdlib.h>     /* srand, rand */
+#include <thread>
+#include <unistd.h>
 
 /* CONSTANT */
 #define SQRT2 1.41421356237
@@ -165,64 +163,6 @@ namespace BipedLab {
             // put ros spin into a background thread
             boost::thread RosSpin(&LiDARTag::_rosSpin, this);
 
-            // Eigen::Matrix3d lie_group;
-            // lie_group << 1, 0, 0,
-            //             0, 0, -1,
-            //             0, 1, 0;
-            // Eigen::Vector3d lie_algebra = utils::Log_SO3(lie_group);
-            // Eigen::Matrix3d lie_test_result = utils::Exp_SO3(lie_algebra);
-            // cout << "rotation: \n" << lie_group << endl;
-            // cout << "lie_algebra: \n" << lie_algebra <<endl;
-            // cout << "lie_test_result: \n" << lie_test_result << endl;
-            // double sign_test = -51;
-            // double sign_result = utils::get_sign(sign_test);
-            // cout << "sign_test" << sign_test << endl;
-            // cout << "sign result" << sign_result << endl;
-            // Eigen::Matrix4f test;
-            // Eigen::Matrix4f test_addition;
-            // test_addition << 1, -2, 3, -4, // 4
-            //        2,  3, -4, 5, // 8
-            //        3, 4, -5, 6, // 6
-            //         4, 5, 6, 7; // 11
-            // test << 1, -2, 3, -4, // 4
-            //        -2,  3, -4, 5, // 8
-            //        -3, -4, -5, 6, // 6
-            //         4, -5, -6, 7; // 11
-            // // Eigen::Vector4f ans = ;
-            // Eigen::Vector4f vect(1,2,5,2);
-            // Eigen::Matrix4f test_abs = test.cwiseAbs();
-            // Eigen::Matrix4f result = test_abs.colwise() - vect;
-            // cout << "matrix: \n" << test << endl;
-            // cout << "addition: \n" << test_addition << endl;
-            // cout << "addition_result\n" << test + test_addition << endl;
-            // cout << "2*matrix: \n" << 2*test << endl;
-            // cout << "abs matrix: \n" << test_abs << endl;
-            // cout << "result: \n" << result << endl;
-            // cout << "ans > 0: \n" << (result.array() > 0 ) << endl;
-            // cout << "ans.cwisemax(0): \n" << result.array().cwiseMax(0) << endl;
-            // cout << "ans.cwisemax(0).sum: \n" << result.array().cwiseMax(0).rowwise().sum() << endl;
-
-            // _LiDAR_system.angle_list.insert(10);
-            // _LiDAR_system.angle_list.insert(10.0049);
-            // _LiDAR_system.angle_list.insert(10.006);
-            // _LiDAR_system.angle_list.insert(10.0061);
-            // _LiDAR_system.angle_list.insert(11);
-            // _LiDAR_system.angle_list.insert(12);
-            // _LiDAR_system.angle_list.insert(11);
-            // cout << "Elements of set in sorted order: \n";
-            // for (auto it : _LiDAR_system.angle_list)
-            //     cout << it << " ";
-
-            // cout << endl;
-
-            // Eigen::MatrixXf convex_hull;
-            // Eigen::MatrixXf P(Eigen::MatrixXf::Random(4, 100));
-            // utils::constructConvexHull(P, convex_hull);
-            // std::cout << "area: " << utils::computePolygonArea(convex_hull) << std::endl;
-
-            // exit(0);
-
-
             ROS_INFO("Waiting for pointcloud data");
             LiDARTag::_waitForPC();
 
@@ -239,8 +179,7 @@ namespace BipedLab {
      */
     void LiDARTag::_mainLoop(){
         ROS_INFO("Start points of interest extraction");
-        // ROS_INFO_STREAM("Tag_size:" << _payload_size);
-        //ros::Rate r(10); // 10 hz
+
         ros::Duration duration(_sleep_time_for_vis);
         clock_t StartAve = clock();
         pcl::PointCloud<PointXYZIRT>::Ptr clusterpc(
@@ -249,8 +188,6 @@ namespace BipedLab {
                 new pcl::PointCloud<PointXYZIRT>);
         pcl::PointCloud<PointXYZIRT>::Ptr payloadpc(
                 new pcl::PointCloud<PointXYZIRT>);
-        // pcl::PointCloud<PointXYZIRT>::Ptr indexpc(
-        //         new pcl::PointCloud<PointXYZIRT>);
         pcl::PointCloud<PointXYZIRT>::Ptr boundarypc(
                 new pcl::PointCloud<PointXYZIRT>);
         pcl::PointCloud<PointXYZIRT>::Ptr tagpc(
@@ -269,7 +206,6 @@ namespace BipedLab {
                 new pcl::PointCloud<PointXYZIRT>);
         clusterpc->reserve(_point_cloud_size);
         clusteredgepc->reserve(_point_cloud_size);
-        // indexpc->reserve(_point_cloud_size);
         tagpc->reserve(_point_cloud_size);
         ini_tagpc->reserve(_point_cloud_size);
         edge_group1->reserve(_point_cloud_size);
@@ -281,16 +217,6 @@ namespace BipedLab {
         payload3dpc->reserve(_point_cloud_size);
         boundarypc->reserve(_point_cloud_size);
         int valgrind_check = 0;
-
-        
-        // std::vector<std::vector<pcl::PointCloud<LiDARPoints_t>>> matData;
-        //_thread_vec = std::make_shared<ThreadPool>(_num_threads);
-        // tbb is never used :/
-        //tbb::task_scheduler_init tbb_init(_num_threads);
-        // _thread_vec(_num_threads);
-        // ROS_INFO_STREAM("")
-
-
 
         int curr_frame = 0;
         int frame_of_interest = 9;
@@ -339,14 +265,6 @@ namespace BipedLab {
                 accumulated_scan = 1;
             }
             
-
-            // cout << "Frame: " << curr_frame << endl;
-            // if (++curr_frame < frame_of_interest) {
-            //     continue;
-            // } else if (curr_frame > frame_of_interest) {
-            //     break;
-            // }
-
             // A vector of clusters
             std::vector<ClusterFamily_t> clusterbuff; 
             
@@ -364,7 +282,6 @@ namespace BipedLab {
             tagpc->clear();
             ini_tagpc->clear();
             boundarypc->clear();
-            // indexpc->clear();
             edge_group1->clear();
             edge_group2->clear();
             edge_group3->clear();
@@ -374,23 +291,12 @@ namespace BipedLab {
             }
             _point_cloud_size = 0;
             
-            // // assigning indices clockwise and 
-            // // rings start from bottom to down (topmost is 32, for example)
-            // for(int ring_number =_beam_num-1; ring_number >= 0; --ring_number) {
-            //     for (int index=0; index<_np_ring; index++) {
-            //         indexpc->push_back(ordered_buff[ring_number][index].point);
-            //     }
-            // }
-            //publish detectionArray 
-            // LiDARTag::_detectionArrayPublisher(clusterbuff);
             // Prepare results for rviz
             visualization_msgs::MarkerArray cluster_markers;
             LiDARTag::_clusterToPclVectorAndMarkerPublisher(
                     clusterbuff, clusterpc, clusteredgepc, payloadpc, payload3dpc,
                     tagpc, ini_tagpc, edge_group1, edge_group2, edge_group3,
                     edge_group4, boundarypc, cluster_markers); 
-            // add clusters to mat files
-            // LiDARTag::_saveTemporalCluster(clusterbuff, matData); 
 
             // publish lidartag poses
             _lidartag_pose_pub.publish(_lidartag_pose_array);
@@ -403,8 +309,6 @@ namespace BipedLab {
                     clusteredgepc, _pub_frame, string("clusteredgepc"));
             LiDARTag::_publishPC(
                     clusterpc, _pub_frame, string("Cluster"));
-            // LiDARTag::_publishPC(
-            //         indexpc, _pub_frame, string("Indexcolumn"));
             LiDARTag::_publishPC(
                     edge_group1, _pub_frame, string("edgegroup1"));
             LiDARTag::_publishPC(
@@ -441,7 +345,7 @@ namespace BipedLab {
                 LiDARTag::_publishPC(
                         ini_tagpc, _pub_frame, string("InitialTarget"));
             }
-            //exit(0);
+
             if (_sleep_to_display) duration.sleep(); 
             if (_debug_time) {
                 _timing.total_time = 
@@ -449,8 +353,7 @@ namespace BipedLab {
                             std::chrono::steady_clock::now(), 
                             _timing.start_total_time);
             }
-            // ROS_INFO_STREAM("Hz (total): " << 1e3/_timing.total_time);
-            // cout << "\033[1;31m====================================== \033[0m\n";
+
             if (_valgrind_check){
                 valgrind_check++;
                 if (valgrind_check > 0) {
@@ -458,8 +361,7 @@ namespace BipedLab {
                     break;
                 }
             }
-        } // ros::ok()
-        // LiDARTag::_saveMatFiles(matData);
+        }
     }
 
     /*
@@ -494,8 +396,6 @@ namespace BipedLab {
         bool GotLidarTopic = 
             ros::param::get("pointcloud_topic", _pointcloud_topic);
         bool GotBeamNum = ros::param::get("beam_number", _beam_num);
-        //bool GotSize = ros::param::get("tag_size", _payload_size);
-
         bool GotTagFamily = ros::param::get("tag_family", _tag_family);
         bool GotTagHamming = 
             ros::param::get("tag_hamming_distance", _tag_hamming_distance);
@@ -513,10 +413,7 @@ namespace BipedLab {
         bool GotVerticalFOV = ros::param::get("vertical_fov", _vertical_fov);
         bool GotFillInGapThreshold = 
             ros::param::get("fill_in_gap_threshold", _filling_gap_max_index);
-        // bool GotFillInMaxPointsThreshold = 
-        //     ros::param::get(
-        //             "fill_in_max_points_threshold", 
-        //             fill_in_max_points_threshold);
+
         bool GotPointsThresholdFactor = 
             ros::param::get(
                     "points_threshold_factor", _points_threshold_factor);
@@ -542,13 +439,6 @@ namespace BipedLab {
         bool GotDecodeMode = 
             ros::param::get("decode_mode", _decode_mode);
         bool GotGridViz = ros::param::get("grid_viz", _grid_viz);
-
-        // bool GotStatsFilePath = 
-        //     ros::param::get("stats_file_path", _stats_file_path);
-        // bool GotClusterFilePath = 
-        //     ros::param::get("cluster_file_path", _cluster_file_path);
-        // bool GotPoseFilePath = 
-        //     ros::param::get("pose_file_path", _pose_file_path);
         bool GotOutPutPath = ros::param::get("outputs_path", _outputs_path);
         bool GotLibraryPath = ros::param::get("library_path", _library_path);
         bool GotNumCodes = ros::param::get("num_codes", _num_codes);
@@ -696,9 +586,6 @@ namespace BipedLab {
         _num_threads = std::min((int) num_processor, _num_threads);
 
         _iter = 0;
-
-        // point association threshold (which cluster the point belongs to?)
-        // cout << "_linkage_tunable: " << _linkage_tunable << endl;
         _linkage_threshold = _linkage_tunable * _payload_size * SQRT2 / 4;
         if (_has_ring) {
             _use_ring = true;
@@ -709,8 +596,7 @@ namespace BipedLab {
                 _use_ring = false;
             }
         }
-        // cout << "link threshold: " << _linkage_threshold << endl;
-        // exit(0);
+
         _RANSAC_threshold = _payload_size/10;
 
         ROS_INFO("Subscribe to %s\n", _pointcloud_topic.c_str());
@@ -722,8 +608,6 @@ namespace BipedLab {
         ROS_INFO("_vertical_fov: %f \n", _vertical_fov);
         ROS_INFO("_fine_cluster_threshold: %i \n", _fine_cluster_threshold);
         ROS_INFO("_filling_gap_max_index: %i \n", _filling_gap_max_index);
-        // ROS_INFO("_filling_max_points_threshold: %i \n", 
-        //         _filling_max_points_threshold);
         ROS_INFO("_points_threshold_factor: %f \n", _points_threshold_factor);
         ROS_INFO("_adaptive_thresholding: %i \n", _adaptive_thresholding);
         ROS_INFO("_collect_dataset: %i \n", _collect_dataset);
@@ -743,16 +627,12 @@ namespace BipedLab {
     std::vector<std::vector<LiDARPoints_t>> 
         LiDARTag::_getOrderBuff(){
         _point_cloud1_queue_lock.lock();
-        // ;boost::mutex::scoped_lock(_point_cloud1_queue_lock);
+
         if (_point_cloud1_queue.size()==0) {
             _point_cloud1_queue_lock.unlock();
-
-            //cout << "Pointcloud queue is empty" << endl;
-            //cout << "size: " << empty.size() << endl;
             vector<vector<LiDARPoints_t>> empty;
             return empty;
         }
-        // ROS_INFO_STREAM("Queue size: " << _point_cloud1_queue.size());
 
         sensor_msgs::PointCloud2ConstPtr msg = _point_cloud1_queue.front();
         _point_cloud1_queue.pop();
@@ -768,7 +648,7 @@ namespace BipedLab {
         if (!_has_ring && !_ring_estimated) {
             std::vector<float> angles;
             _getAngleVector(pcl_pointcloud, angles);
-            // cout << "angles_size" <<angles.size() << endl;
+
             std::ofstream fangles;
             fangles.open(_outputs_path + "/angles.txt", 
                     std::ofstream::out | std::ofstream::app);
@@ -793,8 +673,6 @@ namespace BipedLab {
         std::vector<std::vector<LiDARPoints_t>> ordered_buff(_beam_num);
         _fillInOrderedPC(pcl_pointcloud, ordered_buff);
         _point_cloud_size = pcl_pointcloud->size();
-        // cout << "pc size: " << _point_cloud_size << endl;
-
         return ordered_buff;
     }
 
@@ -840,19 +718,6 @@ namespace BipedLab {
             _LiDAR_system.ring_average_table.push_back(max_min);
         }
 
-        // if (!_has_ring && _ring_estimation) {
-        //     while (ros::ok()) {
-        //         std::vector<std::vector<LiDARPoints_t>> ordered_buff = 
-        //             LiDARTag::_getOrderBuff(true);
-        //         if (ordered_buff.empty()) {
-        //             continue;
-        //         }
-        //         if (!_has_ring && _ring_estimation && _ring_estimated)
-        //             break;
-        //     }
-        // }
-
-
         // Calulate for each scan with a few seconds 
         int i = 0;
         int num_scan = 0;
@@ -885,8 +750,6 @@ namespace BipedLab {
                 accumulated_scan = 1;
             }
 
-
-            // cout << "i: " << i++ << endl;
             LiDARTag::_maxMinPtsInAScan(
                     _LiDAR_system.point_count_table[num_scan], 
                     _LiDAR_system.max_min_table, 
@@ -907,41 +770,9 @@ namespace BipedLab {
              i != _LiDAR_system.ring_average_table.end(); 
              ++i) {
             (*i).average /= num_scan;
-            // cout << "average: " << (*i).average << endl;
         }
         
         LiDARTag::_pointsPerSquareMeterAtOneMeter();
-
-        // std::vector<int>::iterator it;
-        // it = std::unique(_LiDAR_system.angle_list.begin(), 
-        //         _LiDAR_system.angle_list.end(), angleComparision);
-
-
-
-        // Check values of pointtable and max_min_table
-        // int k = 0;
-        // for (auto i=_LiDAR_system.point_count_table.begin(); i!=_LiDAR_system.point_count_table.end(); ++i, ++k){
-        //     cout << "Vector[" << k << "]:" << endl;
-        //     for (auto j=(*i).begin(); j!=(*i).end(); ++j){
-        //         cout << "points: " << *j << endl;
-        //     }
-        // }
-
-        // k=0;
-        // for (auto i=_LiDAR_system.max_min_table.begin(); i!=_LiDAR_system.max_min_table.end(); ++i, ++k){
-        //     cout << "At scan [" << k << "]" << endl;
-        //     cout << "Max: " << (*i).Max << endl;
-        //     cout << "Min: " << (*i).Min << endl;
-        // }
-
-        // k=0;
-        // for (auto i=_LiDAR_system.ring_average_table.begin(); i!=_LiDAR_system.ring_average_table.end(); ++i, ++k){
-        //     cout << "At ring [" << k << "]" << endl;
-        //     cout << "Max: " << (*i).Max << endl;
-        //     cout << "Ave: " << (*i).average << endl;
-        //     cout << "Min: " << (*i).Min << endl;
-        // }
-        // exit(0);
     }
 
 
@@ -963,7 +794,6 @@ namespace BipedLab {
             system_average / utils::deg2Rad(360.0);
     }
 
-    
     /* 
      * A function to find maximum points and minimum points in a single scan, 
      * i.e. to find extrema within 32 rings
@@ -1014,7 +844,6 @@ namespace BipedLab {
         max_min_table.push_back(max_min);
     }
 
-
     /*
      * A function to transfer pcl msgs to ros msgs and then publish
      * which_publisher should be a string of "organized" or "original" 
@@ -1034,8 +863,6 @@ namespace BipedLab {
                 _original_pc_pub.publish(pcs_waited_to_pub);
             else if (which_publisher=="cluster") 
                 _cluster_pub.publish(pcs_waited_to_pub);
-            // else if (which_publisher=="indexcolumn") 
-            //     _index_pub.publish(pcs_waited_to_pub);
             else if (which_publisher=="payload") 
                 _payload_pub.publish(pcs_waited_to_pub);
             else if (which_publisher=="payload3d") 
@@ -1072,7 +899,6 @@ namespace BipedLab {
         }
 	}
 
-
     /* [basic ros]
      * A function to push the received pointcloud into a queue in the class
      */
@@ -1086,7 +912,6 @@ namespace BipedLab {
         _point_cloud1_queue_lock.lock();
         _point_cloud1_queue.push(pc);
         _point_cloud1_queue_lock.unlock();
-
     }
 
 
@@ -1139,17 +964,9 @@ namespace BipedLab {
                 it = _LiDAR_system.angle_list.find(angle); 
                 p.ring = 
                     std::distance(_LiDAR_system.angle_list.begin(), it);
-                // cout << "angle: " << angle << endl;
-                // if (p.ring==0) {
-                //     cout << "x: " << p.x << endl;
-                //     cout << "y: " << p.y << endl;
-                //     cout << "z: " << p.z << endl;
-                //     cout << "ring: " << p.ring << endl;
-                // }
-                
-                // cout << "point: " << p.x << ", " << p.y << ", " << p.z << ", " << p.ring << endl;
+
             }
-            // cout << "point: " << p.x << ", " << p.y << ", " << p.z << ", " << p.ring << ", " <<p.intensity << endl;
+            
             assert(("Ring Estimation Error", p.ring < _beam_num));
             lidar_point.point = p;
             lidar_point.index = index[p.ring];

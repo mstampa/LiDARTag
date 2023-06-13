@@ -288,7 +288,6 @@ namespace BipedAprilLab{
 				if (qd->entries[bucket].rcode == rcode) {
 					*entry = qd->entries[bucket];
 					entry->rotation = ridx;
-                    //printf("rotation: %i\n", entry->rotation);
 					return;
 				}
 			}

@@ -28,8 +28,10 @@
  * WEBSITE: https://www.brucerobot.com/
  */
 
-#include <ros/ros.h>
 #include <lidartag.h>
+
+#include <ros/ros.h>
+
 
 using namespace std;
 

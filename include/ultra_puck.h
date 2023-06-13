@@ -31,6 +31,8 @@
 #ifndef ULTRA_PUCK_H
 #define ULTRA_PuCK_H
 
+#include <cmath>
+
 namespace BipedLab
 {
 namespace UltraPuckV2
@@ -87,7 +89,7 @@ struct EL_TABLE
    constexpr EL_TABLE() : values()
    {
       for (auto i = 0; i < 32; ++i) {
-         values[i] = tan(el[i]*M_PI/180);
+         values[i] = std::tan(el[i]*M_PI/180);
       }
    }
 

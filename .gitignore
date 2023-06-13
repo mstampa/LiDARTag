@@ -1,4 +1,5 @@
 output/*
 matlab/paper_data/*
+.vscode/*
 *.mat
 *.m~

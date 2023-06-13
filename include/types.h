@@ -27,20 +27,31 @@
  * AUTHOR: Bruce JK Huang (bjhuang@umich.edu)
  * WEBSITE: https://www.brucerobot.com/
  */
+
+#include "nanoflann.hpp"
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/ModelCoefficients.h>
+#include <tf/LinearMath/Transform.h>
+#include <velodyne_pcl/point_types.h>
+
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #include <chrono> // high_resolution_clock
-#include "nanoflann.hpp"
-
 
 namespace BipedLab {
 	using PointXYZIRT = velodyne_pcl::PointXYZIRT;
 
 	typedef struct QuickDecodeEntry {
-		uint64_t rcode;   // the queried code
-		uint16_t id;      // the tag id (a small integer)
-		uint16_t hamming;  // how many errors corrected?
-		uint16_t rotation; // number of rotations [0, 3]
+		uint64_t rcode;   	// the queried code
+		uint16_t id;      	// the tag id (a small integer)
+		uint16_t hamming;  	// how many errors corrected?
+		uint16_t rotation; 	// number of rotations [0, 3]
 	}QuickDecodeEntry_t;
 
 	typedef struct QuickDecode {

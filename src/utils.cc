@@ -30,13 +30,16 @@
 
 
 #include "utils.h"
-#include <math.h>
-#include <iostream>
-#include <numeric>      // std::iota
+
 #include <algorithm>    // std::sort, std::stable_sort
+#include <iostream>
+#include <math.h>
+#include <numeric>      // std::iota
 
 namespace BipedLab{
+
 namespace utils {
+
 // second
 double spendCPUTime(const std::clock_t &t_end, const std::clock_t &t_start){
     return (((double) (t_end - t_start))/CLOCKS_PER_SEC);
@@ -57,12 +60,6 @@ double printSpendCPUHz(
     std::string text = "CPU time used: ";
     printSpendCPUHz(t_end, t_start, text);
 }
-
-
-
-// std::chrono::steady_clock::time_point clock_start = std::chrono::steady_clock::now();
-// std::chrono::duration<double> duration =
-//     std::chrono::steady_clock::now() - clock_start;
 
 double spendElapsedTime(
         const std::chrono::steady_clock::time_point &t_end, 
@@ -98,18 +95,10 @@ double printSpendElapsedHz(
     printSpendElapsedHz(t_end, t_start, text);
 }
 
-
-
-// bool angleComparision (float i, float j) {
-//   return std::abs(i-j) < 1e-3;
-// }
-
 std::string tranferToLowercase(std::string &t_data){
     std::transform(t_data.begin(), t_data.end(), t_data.begin(), ::tolower);
-
     return t_data;
 }
-
 
 
 void pressEnterToContinue() {
@@ -127,7 +116,7 @@ bool isRotationMatrix(Eigen::Matrix3f &t_R) {
 }
 
 Eigen::Vector3f rotationMatrixToEulerAngles(Eigen::Matrix3f &t_R) {
-    // assert(isRotationMatrix(t_R));
+
     float sy = std::sqrt(t_R(0,0) * (0,0) +  
             t_R(1,0) * (1,0));
 
@@ -147,7 +136,6 @@ Eigen::Vector3f rotationMatrixToEulerAngles(Eigen::Matrix3f &t_R) {
 
     return Eigen::Vector3f(x, y, z);
 }
-
 
 /*
  * A function to check if get all parameters
@@ -171,7 +159,7 @@ bool checkParameters(int t_n, ...){
     return Pass;
 }
 
-// Overload operator << for PointXYZRI
+// Overload operator <<
 // DO NOT want to change their stucture
 void COUT(const PointXYZIRT& t_p) {
     std::cout << "x: " << t_p.x << ", y: " << t_p.y << ", z: " << t_p.z << 
@@ -339,7 +327,6 @@ void getProjection(
     PointXYZIRT v1p = vectorize(t_p1, t_p);
 
     k = std::abs(dot(v12, v1p)/Norm(v12));
-    // v = v12;
 }
 
 void assignCellIndex(const float &t_tag_size, const Eigen::Matrix3f &t_R, 
@@ -351,17 +338,11 @@ void assignCellIndex(const float &t_tag_size, const Eigen::Matrix3f &t_R,
     float xOffset = t_vote.p->x - t_average.x;
     float yOffset = t_vote.p->y - t_average.y;
     float zOffset = t_vote.p->z - t_average.z;
-    // float x = t_vote.p->x;
-    // float y = t_vote.p->y;
-    // float z = t_vote.p->z;
 
     float x = xOffset*t_R(0,0) + yOffset*t_R(0,1) + zOffset*t_R(0,2);
     float y = xOffset*t_R(1,0) + yOffset*t_R(1,1) + zOffset*t_R(1,2);
     float z = xOffset*t_R(2,0) + yOffset*t_R(2,1) + zOffset*t_R(2,2);
 
-    // x = x*t_R(0,0) + y*t_R(0,1) + z*t_R(0,2) + t_average.x;
-    // y = x*t_R(1,0) + y*t_R(1,1) + z*t_R(1,2) + t_average.y;
-    // z = x*t_R(2,0) + y*t_R(2,1) + z*t_R(2,2) + t_average.z;
     // y,z should range int_ between -3s and 3s
     t_p_reference.x = x;
     t_p_reference.y = y;
@@ -449,7 +430,7 @@ void fitGrid(Eigen::MatrixXf &GridVertices, Eigen::Matrix3f &H,
         GridVertices.rightCols(4)*payload_vertices.transpose();
     Eigen::JacobiSVD<Eigen::MatrixXf> svd(
             M, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    // Eigen::Matrix<float,3,3,Eigen::DontAlign> R = svd.matrixV()*svd.matrixU().transpose();
+
     Eigen::Matrix<float,3,3,Eigen::DontAlign> R = 
         svd.matrixU()*svd.matrixV().transpose();
     H = R; // H: payload -> ref
@@ -826,10 +807,7 @@ void sortEigenVectorIndices(const Eigen::MatrixXf &mat, Eigen::VectorXi &indices
   std::stable_sort(idx.begin(), idx.end(),
        [&mat](int i1, int i2) {return (mat(1, i1) < mat(1, i2)) || 
        (mat(1, i1) == mat(1, i2) && mat(2, i1) < mat(2, i2));});
-  // Eigen::Transpositions indices(Eigen::Map<Eigen::Matrix<float, num_elements, 1>>(idx));
-  // Eigen::Transpositions indices;
-  // Eigen::Map<Eigen::VectorXi> test(idx.data()).cast<int>();
-  // printVector(idx);
+
   int* ptr = &idx[0];
   Eigen::Map<Eigen::VectorXi> tmp(ptr, num_elements);
   indices = tmp;
@@ -862,45 +840,11 @@ void constructConvexHull(const Eigen::MatrixXf &P, Eigen::MatrixXf &convex_hull)
     if (n <= 3) 
         convex_hull = P;
 
-    // Eigen::MatrixXf Q(Eigen::MatrixXf::Random(3, 4));
-    // Q(1, 0) = 3;
-    // Q(1, 1) = -1;
-    // Q(1, 2) = -2;
-    // Q(1, 3) = 5;
-    // Eigen::VectorXi indices;
-    // sortEigenVectorIndices(Q.row(1), indices); // sort by y 
-    // Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> perm(indices);
-    // Eigen::MatrixXf sorted_points = Q * perm; 
-    // std::cout << "Q: \n" << Q << std::endl;
-    // std::cout << "indices: \n" << indices << std::endl;
-    // std::cout << "sorted Q: \n" << sorted_points << std::endl;
-
 	// Sort points lexicographically
     Eigen::VectorXi indices;
     sortEigenVectorIndices(P, indices);
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> perm(indices);
     Eigen::MatrixXf sorted_points = P * perm;
-    
-    // std::vector<Eigen::Vector4d> up;
-    // std::vector<Eigen::Vector4d> down;
-    // up.push_back(sorted_points.col(0));
-    // down.push_back(sorted_points.col(0));
-    // for (int i = 1; i < sorted_points.cols(); i++) {
-    //     Eigen::Vector4d cur_pt = sorted_points.col(i);
-    //     if (i == sorted_points.cols() - 1 || cross(left_most, cur_pt, right_most) > 0) {
-    //         while (up.size() >= 2 && cross(up[up.size()-2], up[up.size()-1], cur_pt) <= 0)
-    //             up.pop_back();
-    //         up.push_back(cur_pt);
-    //     }
-    //     if (i == sorted_points.cols() - 1 || cross(left_most, cur_pt, right_most) <=0) {
-    //         while(down.size() >= 2 && cross(down[down.size()-2], down[down.size()-1], cur_pt) >= 0)
-    //             down.pop_back();
-    //         down.push_back(cur_pt);
-    //     }
-    // }
-    // up.insert(up.end(), down.begin(), down.end()-1); 
-    // printVector(up);
-
 
     Eigen::Vector4f left_most = sorted_points.col(0);
     Eigen::Vector4f right_most = sorted_points.col(n - 1);
@@ -908,21 +852,15 @@ void constructConvexHull(const Eigen::MatrixXf &P, Eigen::MatrixXf &convex_hull)
 	Eigen::MatrixXf up = Eigen::MatrixXf::Zero(4, n);
 	Eigen::MatrixXf down = Eigen::MatrixXf::Zero(4, n);
     up.col(0) = left_most;
-    // std::cout << "left p: \n" << left_most << std::endl;
-    // std::cout << "right p: \n" <<  right_most << std::endl;
-    // std::cout << "1. up: \n" << up << std::endl;
     int k = 0;
     int j = 0;
 
     for (int i = 0; i < sorted_points.cols(); i++) {
         Eigen::Vector4f cur_pt = sorted_points.col(i);
         if (i == sorted_points.cols() - 1 || cross(left_most, cur_pt, right_most) > 0) {
-            // std::cout << "i: " << i << std::endl;
             while (k >= 2 && cross(up.col(k - 2), up.col(k - 1), cur_pt) <= 0)
                 k--;
             up.col(k++) = cur_pt;
-            // std::cout << "k: " << k << std::endl;
-            // std::cout << "2. up: \n" << up << std::endl;
         }
 
         if (i == sorted_points.cols() - 1 || cross(left_most, cur_pt, right_most) <=0) {
@@ -933,94 +871,7 @@ void constructConvexHull(const Eigen::MatrixXf &P, Eigen::MatrixXf &convex_hull)
     }
     convex_hull.resize(up.rows(), k + j -1);
     convex_hull << up.leftCols(k), down.leftCols(j - 1).rowwise().reverse();
-    // std::cout << "sorted P: \n" << sorted_points << std::endl;
-    // std::cout << "up: \n" << up << std::endl;
-    // std::cout << "down: \n" << down << std::endl;
-    // std::cout << "down reversed: \n" << down.leftCols(j - 1).rowwise().reverse() << std::endl;
-    // std::cout << "ch: \n" << convex_hull << std::endl;
-    // std::cout << "area: " << computePolygonArea(convex_hull) << std::endl;
-    // std::cout << "bool \n: " << up.cast<bool>() << std::endl;
-    // std::cout << "bool.col \n: " << up.cast<bool>().colwise() << std::endl;
-    // std::cout << "bool.col.all \n: " << up.cast<bool>().colwise().all() << std::endl;
-    // std::cout << "up: \n" << up << std::endl;
-    // std::cout << "bool: \n" << up.cast<bool>() << std::endl;
-    // std::cout << "test: \n" << up.cast<bool>().colwise().any() << std::endl;
-    // Eigen::MatrixXd res = up("", up.cast<bool>().colwise().any());
-    // std::cout << "res: \n" << res << std::endl;
-
-	// Eigen::MatrixXd convex_hull = Eigen::MatrixXd::Zero(4, 2 * n);
-	// // Build lower hull
-	// for (size_t i = 0; i < n; ++i) {
-	// 	while (k >= 2 && 
-    //            cross(convex_hull.col(k - 2), 
-    //                  convex_hull.col(k - 1), 
-    //                  sorted_points.col(i)) <= 0) {
-    //         k--;
-    //     }
-	// 	convex_hull.col(k++) = P.col(i);
-	// }
-
-	// // Build upper hull
-	// for (size_t i = n - 1, t = k + 1; i > 0; --i) {
-	// 	while (k >= t && 
-    //            cross(convex_hull.col(k - 2), 
-    //                  convex_hull.col(k - 1), 
-    //                  sorted_points.col(i - 1)) <= 0) {
-    //         k--;
-    //     }
-	// 	convex_hull.col(k++) = P.col(i - 1);
-	// }
-    // std::cout << "convex_hull: \n" << convex_hull.leftCols(k - 1) << std::endl;
-
-	// return convex_hull.leftCols(k - 1);
 }
-
-// float computeMedian(std::vector<float> &vec){
-//     assert(vec.size()!=0);
-//     if (vec.size() % 2 == 0) {
-//         const auto median_it1 = vec.begin() + vec.size() / 2 - 1;
-//         const auto median_it2 = vec.begin() + vec.size() / 2;
-
-//         std::nth_element(vec.begin(), median_it1 , vec.end());
-//         const auto e1 = *median_it1;
-
-//         std::nth_element(vec.begin(), median_it2 , vec.end());
-//         const auto e2 = *median_it2;
-
-//         return (e1 + e2) / 2;
-
-//     } else {
-//         const auto median_it = vec.begin() + vec.size() / 2;
-//         std::nth_element(vec.begin(), median_it , vec.end());
-
-//         return *median_it;
-//     }
-// }
-
-
-// template <typename T>
-// T computeMedian(std::vector<T> &vec){
-//     assert(vec.size()!=0);
-//     if (vec.size() % 2 == 0) {
-//         const auto median_it1 = vec.begin() + vec.size() / 2 - 1;
-//         const auto median_it2 = vec.begin() + vec.size() / 2;
-
-//         std::nth_element(vec.begin(), median_it1 , vec.end());
-//         const T e1 = *median_it1;
-
-//         std::nth_element(vec.begin(), median_it2 , vec.end());
-//         const T e2 = *median_it2;
-
-//         return (e1 + e2) / 2;
-
-//     } else {
-//         const auto median_it = vec.begin() + vec.size() / 2;
-//         std::nth_element(vec.begin(), median_it , vec.end());
-
-//         return *median_it;
-//     }
-// }
-
 
 } // utils
 } // Bipedlab

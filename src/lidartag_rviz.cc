@@ -78,22 +78,7 @@ namespace BipedLab {
     void LiDARTag::_assignVectorMarker(visualization_msgs::Marker &Marker, const uint32_t Shape, const string NameSpace,
                                const double r, const double g, const double b,
                                const int Count, const double Size, Eigen::Vector3f edge_vector, const PointXYZIRT &centriod, const string Text){
-        // LiDARTag::_assignMarker(Marker, visualization_msgs::Marker::SPHERE, NameSpace,
-        //              r, g, b,
-        //              centriod, 
-        //              Count, Size, Text);
-
-        // PointXYZIRT p2;
-        // p2.x = centriod.x + edge_vector[0];
-        // p2.y = centriod.y + edge_vector[1];
-        // p2.z = centriod.z + edge_vector[2]; 
-        // LiDARTag::_assignMarker(Marker, visualization_msgs::Marker::SPHERE, NameSpace,
-        //              r, g, b,
-        //              p2, 
-        //              Count+1, Size, Text);   
-
-
-
+        
         Marker.header.frame_id = _pub_frame;
         Marker.header.stamp = _current_scan_time;
         Marker.ns = NameSpace;
@@ -121,8 +106,6 @@ namespace BipedLab {
         Marker.scale.x = 0.02;
         Marker.scale.y = Size;
         Marker.scale.z = Size;
-        // Set the color -- be sure to set alpha to something non-zero!
-
     }    
     void LiDARTag::_plotIdealFrame(){
         visualization_msgs::MarkerArray FrameMarkArray;
@@ -168,47 +151,11 @@ namespace BipedLab {
         _ideal_frame_pub.publish(FrameMarkArray);
     }
 
-        // visualization_msgs::Marker line_list;
-        // line_list.id = 0;
-        // line_list.header = _point_cloud_header;
-        // line_list.type = visualization_msgs::Marker::LINE_LIST;
-        // line_list.color.g = 1.0;
-        // line_list.color.a = 1.0;
-        // line_list.scale.x = 0.01;
-
-        // vector<vector<int>> vertex = {{1,1},{1,-1},{-1,-1}, {-1,1}}; 
-        // for(int i = 0; i < 4; ++i){
-        //     vector<int> v = vertex[i];
-        //     geometry_msgs::Point p;
-        //     p.x = -0.02;
-        //     p.y = v[0]*1.22/2;    //_payload_size
-        //     p.z = v[1]*1.22/2;
-        //     line_list.points.push_back(p);
-        //     p.x = 0.02;
-        //     line_list.points.push_back(p);
-        // }
-
-        // for(int j = -1; j<=1; j+=2){
-        //   for(int i = 0; i < 4; ++i){
-        //       vector<int> v = vertex[i];
-        //       geometry_msgs::Point p;
-        //       p.x = j* 0.02;
-        //       p.y = v[0]*1.22/2;
-        //       p.z = v[1]*1.22/2;
-        //       line_list.points.push_back(p);
-        //       v = vertex[(i+1)%4];
-        //       p.y = v[0]*1.22/2;
-        //       p.z = v[1]*1.22/2;
-        //       line_list.points.push_back(p);
-        //   }
-        // }
-
     void LiDARTag::_plotTagFrame(const ClusterFamily_t &cluster){
         visualization_msgs::Marker line_list;
         line_list.id = cluster.cluster_id;
         line_list.header = _point_cloud_header;
         line_list.type = visualization_msgs::Marker::LINE_LIST;
-        // line_list.ns = "tag_size_" + to_string(_tag_size_list[k]);
         line_list.color.r = 0.0;
         line_list.color.g = 1.0;
         line_list.color.b = 1.0;
@@ -276,13 +223,11 @@ namespace BipedLab {
         p.z = centriod.z;
         edge.points.push_back(p);
 
-        //edge_vector = (edge_vector*_payload_size).eval();
         p.x += edge_vector[0];
         p.y += edge_vector[1];
         p.z += edge_vector[2];
         edge.points.push_back(p);
 
-        //_edge_vector_pub.publish(edge);
         return edge;
     }
     /*
@@ -307,6 +252,7 @@ namespace BipedLab {
         visualization_msgs::MarkerArray BoundMarkArray;
         visualization_msgs::MarkerArray PayloadMarkArray;
         visualization_msgs::MarkerArray IDMarkArray;
+
         // Used to identify between multiple clusters in a single point
         // cloud in the analysis file. The id being reset to 1 each time
         // the function is called is supposed to indicate in the output 
@@ -319,16 +265,6 @@ namespace BipedLab {
         for (int Key=0; Key<Cluster.size() ;++Key) {
             if (Cluster[Key].valid != 1) continue;
             LiDARTag::_plotTagFrame(Cluster[Key]);
-            // std::cout << "Valid Cluster number "<< ++Clustercount << ": " << Key << " Size: " << Cluster[Key].data.size() << std::endl;
-            // if (Clustercount != 5) continue;
-            // for (int j=0; j<_beam_num; ++j){
-            //     cout << "\033[1;31m============== \033[0m\n";
-            //     cout << "(i, j): " << Key << ", " << j << endl;
-            //     int MaxIndex = Cluster[Key].max_min_index_of_each_ring[j].max;
-            //     int MinIndex = Cluster[Key].max_min_index_of_each_ring[j].min;
-            //     cout << "MaxIndex: " << MaxIndex << endl;
-            //     cout << "MinIndex: " << MinIndex << endl;
-            // }
 
             visualization_msgs::Marker Marker;
             visualization_msgs::Marker BoundaryMarker;
@@ -369,20 +305,13 @@ namespace BipedLab {
                                   r, g, b,
                                   Cluster[Key].left_most_point, 5, 0.02);
             BoundMarkArray.markers.push_back(BoundaryMarker);
-            
 
-
-
-            // Display cluster information
-            // how many points are supposed to be on the this tag
-            // int AvePoints = LiDARTag::_areaPoints(Cluster[Key].average.x, _payload_size, _payload_size);  
             LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::SPHERE, 
                                   "AveragePoint" + to_string(Cluster[Key].cluster_id), 
                                   1, 0, 0,
                                   Cluster[Key].average, 1, 0.05);
             BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            // int SupposedPoints = LiDARTag::_areaPoints(Cluster[Key].average.x, _payload_size, _payload_size);  
+  
             LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::TEXT_VIEW_FACING, 
                                   "Text" + to_string(Cluster[Key].cluster_id), 
                                   1, 1, 1,
@@ -395,7 +324,6 @@ namespace BipedLab {
                                          "\nNormal vector: " + to_string(Cluster[Key].normal_vector(0)) + ", " +
                                                                to_string(Cluster[Key].normal_vector(1)) + ", " +
                                                                to_string(Cluster[Key].normal_vector(2)) +
-                                         // "\nSupposed points: " + to_string((int)SupposedPoints/_points_threshold_factor) + 
                                          "\nActual points: " + to_string(Cluster[Key].data.size()) + ", " +
                                          "\nNumber of inliers: " + to_string(Cluster[Key].inliers) + ", " +
                                          "\nPercentages of inliers: " + to_string(Cluster[Key].percentages_inliers) + ", " +
@@ -413,245 +341,13 @@ namespace BipedLab {
                                       )
                                   );
             BoundMarkArray.markers.push_back(BoundaryMarker);
-            // if (_write_CSV){
-                // std::fstream file;
-                // std::string path("/home/alex/catkin_ws/src/LiDARTag/output");
 
-                // write poses
-                // file.open(path + "/LiDARTag.txt", 
-                //            ios::in|ios::out|ios::app);
-                // if (file.is_open()){
-                //     file << Cluster[Key].cluster_id << ", ";
-                //     file << Cluster[Key].pose.translation[0] << ", ";
-                //     file << Cluster[Key].pose.translation[1] << ", ";
-                //     file << Cluster[Key].pose.translation[2] << ", ";
-                //     file << Cluster[Key].pose.roll << ", ";
-                //     file << Cluster[Key].pose.pitch << ", ";
-                //     file << Cluster[Key].pose.yaw << "\n ";
-                //     file.close();
-                // }
-                // else{
-                //     cout << "FAILED opening LiDARTag.txt" << endl;
-                //     exit(0);
-                // }
-
-                // write Timing
-                // file.open(path + "/Analysis.txt", ios::in|ios::out|ios::app);
-                // if (file.is_open()){
-                //     file << cluster_pc_id++ << ",";
-                //     file << _timing.computation_time << ",";
-                //     file << _timing.edgingand_clustering_time << ","; 
-                //     file << _timing.point_check_time << ",";
-                //     file << _timing.line_fitting_time << ",";
-                //     file << _timing.payload_extraction_time << ","; 
-                //     file << _timing.normal_vector_time << ",";
-                //     file << _timing.payload_decoding_time << ",";
-                //     file << _timing.tag_to_robot_time << ",";
-                //     file << Cluster[Key].data.size() << ",";
-                //     file << Cluster[Key].payload_without_boundary << ",";
-                //     file << _result_statistics.point_cloud_size << ",";
-                //     file << _result_statistics.edge_cloud_size << ",";
-                //     file << _result_statistics.original_cluster_size << ",";
-                //     file << _result_statistics.cluster_removal.removed_by_point_check << ",";
-                //     file << _result_statistics.remaining_cluster_size << ",";
-                //     file << _result_statistics.cluster_removal.boundary_point_check << ",";
-                //     file << _result_statistics.cluster_removal.no_edge_check << "\n";
-                //     file.close();
-                // }
-                // else{
-                //     cout << "FAILED opening Analysis.txt" << endl;
-                //     exit(0);
-                // }
-            // }
-            //Principal Axes
-            // Normal vector
-
-            // LiDARTag::_assignVectorMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-            //                       "NormalVector_x" + to_string(Cluster[Key].cluster_id), 
-            //                       1, 0, 0,
-            //                       0, 0.01, Cluster[Key].principal_axes.col(0), Cluster[Key].average);
-            // BoundMarkArray.markers.push_back(BoundaryMarker);
-            // LiDARTag::_assignVectorMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-            //                       "NormalVector_y" + to_string(Cluster[Key].cluster_id), 
-            //                       0, 1, 0,
-            //                       1, 0.01, Cluster[Key].principal_axes.col(1), Cluster[Key].average);
-            // BoundMarkArray.markers.push_back(BoundaryMarker);
             LiDARTag::_assignVectorMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
                                   "NormalVector_z" + to_string(Cluster[Key].cluster_id), 
                                   0, 0, 1,
                                   2, 0.01, Cluster[Key].principal_axes.col(2), Cluster[Key].average);
             BoundMarkArray.markers.push_back(BoundaryMarker);
-            // BoundaryMarker.scale.x = 0;
-            // BoundaryMarker.scale.y = 0;
-            // BoundaryMarker.scale.z = 0;
-            // // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            // //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            // geometry_msgs::Point start_point;
-            // geometry_msgs::Point end_point;
-            // start_point.x = Cluster[Key].average.x;
-            // start_point.y = Cluster[Key].average.y;
-            // start_point.z = Cluster[Key].average.z;
-            // BoundaryMarker.points.push_back(start_point);
-            // end_point.x = Cluster[Key].average.x + Cluster[Key].principal_axes.col(0)(0);
-            // end_point.y = Cluster[Key].average.y + Cluster[Key].principal_axes.col(0)(1);
-            // end_point.z = Cluster[Key].average.z + Cluster[Key].principal_axes.col(0)(2);
-            // BoundaryMarker.points.push_back(end_point);
-            // BoundaryMarker.pose.orientation.x = 0;
-            // BoundaryMarker.pose.orientation.y = 0;
-            // BoundaryMarker.pose.orientation.z = 0;
-            // BoundaryMarker.pose.orientation.w = 0; 
-            // BoundMarkArray.markers.push_back(BoundaryMarker);
 
-            // LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-            //                       "NormalVector_y" + to_string(Cluster[Key].cluster_id), 
-            //                       0, 1, 0,
-            //                       Cluster[Key].average, 1, 0.01);
-            // BoundaryMarker.scale.x = 0;
-            // BoundaryMarker.scale.y = 0;
-            // BoundaryMarker.scale.z = 0;
-            // // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            // //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            // BoundaryMarker.points.push_back(start_point);
-            // end_point.x = Cluster[Key].average.x + Cluster[Key].principal_axes.col(1)(0);
-            // end_point.y = Cluster[Key].average.y + Cluster[Key].principal_axes.col(1)(1);
-            // end_point.z = Cluster[Key].average.z + Cluster[Key].principal_axes.col(1)(2);
-            // BoundaryMarker.points.push_back(end_point);
-            // BoundaryMarker.pose.orientation.x = 0;
-            // BoundaryMarker.pose.orientation.y = 0;
-            // BoundaryMarker.pose.orientation.z = 0;
-            // BoundaryMarker.pose.orientation.w = 0; 
-            // BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            // LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-            //                       "NormalVector_z" + to_string(Cluster[Key].cluster_id), 
-            //                       0, 0, 1,
-            //                       Cluster[Key].average, 1, 0.01);
-            // BoundaryMarker.scale.x = 0;
-            // BoundaryMarker.scale.y = 0;
-            // BoundaryMarker.scale.z = 0;
-            // // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            // //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            // BoundaryMarker.points.push_back(start_point);
-            // end_point.x = Cluster[Key].average.x + Cluster[Key].principal_axes.col(2)(0);
-            // end_point.y = Cluster[Key].average.y + Cluster[Key].principal_axes.col(2)(1);
-            // end_point.z = Cluster[Key].average.z + Cluster[Key].principal_axes.col(2)(2);
-            // BoundaryMarker.points.push_back(end_point);
-            // BoundaryMarker.pose.orientation.x = 0;
-            // BoundaryMarker.pose.orientation.y = 0;
-            // BoundaryMarker.pose.orientation.z = 0;
-            // BoundaryMarker.pose.orientation.w = 0; 
-            // BoundMarkArray.markers.push_back(BoundaryMarker);            
-
-            /*
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector1" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector2" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector3" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector4" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector5" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector6" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-
-            LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::ARROW, 
-                                  "NormalVector7" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 0,
-                                  Cluster[Key].average, 1, 0.01);
-            BoundaryMarker.scale.x = 0.15;
-            // BoundaryMarker.pose.orientation.x = (Cluster[Key].normal_vector(0)>0) ?  
-            //                                     -Cluster[Key].normal_vector(0) : Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.x = Cluster[Key].normal_vector(0);
-            BoundaryMarker.pose.orientation.y = Cluster[Key].normal_vector(1);
-            BoundaryMarker.pose.orientation.z = Cluster[Key].normal_vector(2);
-            BoundaryMarker.pose.orientation.w = 0; 
-            BoundMarkArray.markers.push_back(BoundaryMarker);
-            */
-
-
-
-            // LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::SPHERE, 
-            //                       "Average" + to_string(Cluster[Key].cluster_id), 
-            //                       r, g, b,
-            //                       Cluster[Key].average, 5, 0.04);
-            // BoundMarkArray.markers.push_back(BoundaryMarker);
-            
-
-
-            //_cluster_pub.publish(BoundaryMarkerList); 
-            //LiDARTag::_assignLine(BoundaryMarkerList, visualization_msgs::Marker::LINE_STRIP, 
-            //                    r, g, b,
-            //                    Cluster[Key], 1);
-            //_cluster_pub.publish(BoundaryMarkerList); 
-
-            // _boundary_marker_pub.publish(BoundMarkArray);
             if (_id_decoding) {
                 visualization_msgs::Marker IDMarker;
                 LiDARTag::_assignMarker(IDMarker, visualization_msgs::Marker::TEXT_VIEW_FACING, 
@@ -706,59 +402,16 @@ namespace BipedLab {
             }
             else {
 
-                // cout << "size1: " << Cluster[Key].payload_boundary_ptr.size() << endl;
                 int count = 0;
                 for (int i=0; i<Cluster[Key].payload_boundary_ptr.size(); ++i){
-                    // cout << "i: " << i << endl;
-                    // if (Cluster[Key].payload_boundary_ptr[i].size()==0) continue;
-                    // else{
-                    //     // cout << "size2: " << Cluster[Key].payload_boundary_ptr[i].size() << endl;
-                    //     LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::SPHERE, 
-                    //                           "PayloadBoundary_" + to_string(Cluster[Key].cluster_id), 
-                    //                           1, 0, 0,
-                    //                           Cluster[Key].payload_boundary_ptr[i][0]->point, count, 0.015);
-                    //     PayloadMarkArray.markers.push_back(PayloadMarker);
-                    //     count ++;
-
-                    //     LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::SPHERE, 
-                    //                           "PayloadBoundary_" + to_string(Cluster[Key].cluster_id), 
-                    //                           1, 0, 0,
-                    //                           Cluster[Key].payload_boundary_ptr[i][1]->point, count, 0.015);
-                    //     count ++;
-                    //     PayloadMarkArray.markers.push_back(PayloadMarker);
-                    // }
-                    // for (int k=0; k<Cluster[Key].payload_boundary_ptr[i].size(); ++k){
-                        // cout << "(i, k): (" << i << "," << k << ")" << endl;
-                        // cout << "size2: " << Cluster[Key].payload_boundary_ptr[i].size() << endl;
                         LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::SPHERE, 
                                               "PayloadBoundary_" + to_string(Cluster[Key].cluster_id), 
                                               1, 0, 0,
                                               Cluster[Key].payload_boundary_ptr[i]->point, i, 0.015);
                         PayloadMarkArray.markers.push_back(PayloadMarker);
                         count ++;
-                    // }
                 }
             }
-
-            // Text
-            /*
-            LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::TEXT_VIEW_FACING, 
-                                  "PayloadUpperBoundary_text_" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 1,
-                                  Cluster[Key].tag_edges.upper_line[0]->point, 5, 0.05,
-                                  string("Ring: " + to_string(Cluster[Key].tag_edges.upper_line[0]->point.ring))
-                                  );
-            PayloadMarkArray.markers.push_back(PayloadMarker);
-
-            LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::TEXT_VIEW_FACING, 
-                                  "PayloadLowerBoundary_text_" + to_string(Cluster[Key].cluster_id), 
-                                  1, 1, 1,
-                                  Cluster[Key].tag_edges.lower_line[0]->point, 5, 0.05,
-                                  string("Ring: " + to_string(Cluster[Key].tag_edges.lower_line[0]->point.ring))
-                                  );
-            PayloadMarkArray.markers.push_back(PayloadMarker);
-            */
-
 
             // corner points and RANSAC line
             if (_adaptive_thresholding){
@@ -799,25 +452,9 @@ namespace BipedLab {
                 }
             }
 
-            // Add lines to the tag
-            //LiDARTag::_assignLine(PayloadMarker, PayloadMarkArray,
-            //                    visualization_msgs::Marker::LINE_STRIP, 
-            //                    "left_line_" + to_string(Cluster[Key].cluster_id), 
-            //                    r, g, b,
-            //                    PointTL, PointTR, 1);
-            //PayloadMarkArray.markers.push_back(PayloadMarker);
-           
-            // TODO: Too many for loops, could be done in a better way.
-            // Some of the loops are inside of the _detectionArrayPublisher
-            // Changes NEEDED!
-
-            // Draw all detected-filled cluster points
-
-
             for (int i=0; i<Cluster[Key].data.size(); ++i){
                 if (Cluster[Key].data[i].valid != 1) continue;
                 PointsInClusters++;
-                // std::cout << Cluster[Key].data[i].point.ring << " index:" << Cluster[Key].data[i].index << " x: " << Cluster[Key].data[i].point.x << " y: " << Cluster[Key].data[i].point.y <<" z: "<<Cluster[Key].data[i].point.z << endl;
                 OutCluster->push_back(Cluster[Key].data[i].point);
                 
                 double Intensity = Cluster[Key].data[i].point.intensity;
@@ -853,38 +490,7 @@ namespace BipedLab {
                     }
                 }
             }
-            // Add all payload points to a vector and will be publish to another
-            // channel for both visualizatoin and creating training datasets
-            // cout << "payload size2: " << Cluster[Key].payload.size() << endl;
-            // for (int i=0; i<Cluster[Key].data.size(); ++i){
-            //     if (Cluster[Key].data[i].valid != 1) continue;
-            //     Eigen::Vector4f p(Cluster[Key].data[i].point.x, Cluster[Key].data[i].point.y, Cluster[Key].data[i].point.z, 1);
-            //     Eigen::Vector4f tp = Cluster[Key].ini_pose.homogeneous * p;
-            //     PointXYZIRT point;
-            //     point.x = tp[0];
-            //     point.y = tp[1];
-            //     point.z = tp[2];
-            //     point.intensity = Cluster[Key].data[i].point.intensity;
-            //     OutPayload->push_back(point);
-            //     OutPayload->push_back(Cluster[Key].data[i].point);
-            //     // cout << "Intensity: " << Cluster[Key].payload[i]->point.intensity << endl;
-            // }
 
-            // for (int i=0; i<Cluster[Key].edge_points.size(); ++i){
-            //     if (Cluster[Key].edge_points[i].valid != 1) continue;
-            //     Eigen::Vector4f p(Cluster[Key].edge_points[i].point.x, Cluster[Key].edge_points[i].point.y, Cluster[Key].edge_points[i].point.z, 1);
-            //     Eigen::Vector4f tp = Cluster[Key].ini_pose.homogeneous * p;
-            //     PointXYZIRT point;
-            //     point.x = tp[0];
-            //     point.y = tp[1];
-            //     point.z = tp[2];
-            //     point.intensity = Cluster[Key].edge_points[i].point.intensity;
-            //     OutPayload->push_back(point);
-            //     OutPayload->push_back(Cluster[Key].edge_points[i].point);
-            //     // cout << "Intensity: " << Cluster[Key].payload[i]->point.intensity << endl;
-            // }
-            // ROS_INFO_STREAM("rows: " << Cluster[Key].rkhs_decoding.template_points_3d.rows());
-            // ROS_INFO_STREAM("cols: " << Cluster[Key].rkhs_decoding.template_points_3d.cols());
             if (_id_decoding) {
                 for (int i=0; i<Cluster[Key].rkhs_decoding.associated_pattern_3d->cols(); ++i){
                     PointXYZIRT point;
@@ -896,7 +502,6 @@ namespace BipedLab {
                     } else {
                         point.intensity = 50;
                     }
-                    // point.intensity = Cluster[Key].rkhs_decoding.associated_pattern_3d->col(i)(3);
                     OutPayload->push_back(point);
                 }
                 for (int i=0; i<Cluster[Key].rkhs_decoding.template_points_3d.cols(); ++i){
@@ -931,19 +536,13 @@ namespace BipedLab {
             _detectionArrayPublisher(Cluster[Key]);
 
         } 
-        // if (PointsInClusters>_filling_max_points_threshold) {
-        //     cout << "Too many points on a tag" << endl;
-        //     // exit(-1);
-        // }
+
         detectionsToPub.header = _point_cloud_header;
         detectionsToPub.frame_index = _point_cloud_header.seq; 
-        //cout << "BoundaryMarkerList size/10: " << BoundaryMarkerList.points.size()/10 << endl;
         _boundary_marker_pub.publish(BoundMarkArray); 
         _cluster_marker_pub.publish(ClusterArray); 
         _payload_marker_pub.publish(PayloadMarkArray);
         _id_marker_pub.publish(IDMarkArray);
-        // srand(time(0));
-        // if (rand()%10 < 7)
         _detectionArray_pub.publish(detectionsToPub); 
     }
 }

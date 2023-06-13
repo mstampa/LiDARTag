@@ -28,19 +28,19 @@
  * WEBSITE: https://www.brucerobot.com/
  */
 
+#include "ultra_puck.h"
+#include "lidartag.h"
+
 #include <pcl/point_types.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <ros/package.h>
 #include <velodyne_pcl/point_types.h>
 #include <velodyne_pointcloud/pointcloudXYZIRT.h> 
 
 #include <fstream>
-#include <ros/package.h> // package
-
-#include "ultra_puck.h"
-#include "lidartag.h"
 
 #define SQRT2 1.41421356237
 
@@ -57,51 +57,22 @@ namespace BipedLab {
     bool LiDARTag::_clusterPointsCheck(ClusterFamily_t &Cluster){
         
         auto distance = sqrt(pow(Cluster.average.x,2) + pow(Cluster.average.y,2));
-        // cout << "distance: " << distance << "X: " << Cluster.average.x << "Y: " << Cluster.average.y << endl;
         int maxPoints = LiDARTag::_areaPoints(distance, _payload_size*SQRT2, _payload_size*SQRT2);
         int minPoints = LiDARTag::_areaPoints(distance, _payload_size/SQRT2, _payload_size/SQRT2);
-        // cout << "Cluster Size: " << Cluster.data.size() << " Max Points: " << maxPoints << " Min Points: " << minPoints << endl;
-        //cout << "Data: " << Cluster.data.size() << endl;
-        // return true;
-        // if (Cluster.data.size() < floor(points/ _points_threshold_factor)) return false;
-        // else return true;
 
-        if (Cluster.data.size() < minPoints) { // Cluster.data.size() > maxPoints) { // || Cluster.data.size() < minPoints) {
+        if (Cluster.data.size() < minPoints) {
             return false;
         } else {
             return true;
         }
     }
 
-        /*
+    /*
      * A function to get a number of points on a given-distance tag or object
      */
     int LiDARTag::_areaPoints(const double &Distance, const double &ObjWidth, const double &ObjHeight){
-        // double WAngle = ObjWidth * (1 + SQRT2) / abs(Distance);
-
-        // if (WAngle>=1) return (int) 1e6; // return big number to reject the cluster
-
-        // double HAngle = ObjHeight * (1 + SQRT2) / abs(Distance);
-        // if (HAngle>=1) return (int) 1e6; // return big number to reject the cluster
-
-        // double HorizontalAngle = asin(WAngle); // in radian
-        // double VerticalAngle = asin(HAngle); // in radian
-        // int NumOfVerticalRing = floor(VerticalAngle * _LiDAR_system.beam_per_vertical_radian);
-        // int NumOfHorizontalPoints = floor(HorizontalAngle * _LiDAR_system.point_per_horizontal_radian);
-
-        // // use 3 instead of 2 becasue of we assume the tag would be put in the dense
-        // // region of LiDAR (LiDAR is denser in the middle)
-        // int Area = floor(3 * (NumOfVerticalRing * NumOfHorizontalPoints) / (1 + SQRT2)); 
-
-        // cout << "distance: " << Distance << endl;
-        // //cout << "HorizontalAngle: " << HorizontalAngle << endl;
-        // //cout << "VerticalAngle: " << VerticalAngle << endl;
 
         int NumOfHorizontalPoints = ceil(ObjWidth / (Distance * tan(0.1 * M_PI / 180)));
-
-
-        //int NumOfHorizontalPoints = 2 * atan((ObjWidth / 2) / abs(Distance)) * 
-        //    _LiDAR_system.point_per_horizontal_radian;
         double HalfVerticalAngle = atan((ObjHeight / 2) / abs(Distance)) * 180 / M_PI;
 
         int NumOfVerticalRing = 0;
@@ -112,14 +83,8 @@ namespace BipedLab {
                 NumOfVerticalRing++;
             }
         }
-        int Area = NumOfVerticalRing * NumOfHorizontalPoints;
-
-        // cout << "NumOfVerticalRing: " << NumOfVerticalRing << endl;
-        // cout << "NumOfHorizontalPoints: " << NumOfHorizontalPoints << endl;
-        // cout << "Area: " << Area << endl;
-        // cout << "Points / Radian: " << _LiDAR_system.point_per_horizontal_radian << endl;
-
-        return Area;
+ 
+        return NumOfVerticalRing * NumOfHorizontalPoints;;
     }
 
     /*
@@ -136,31 +101,8 @@ namespace BipedLab {
         float payload_w =  SQRT2 * _payload_size;
         int num_horizontal_points = std::ceil(payload_w / (distance * std::sin(point_resolution)));
         int num_vertical_ring = std::abs(cluster.top_ring - cluster.bottom_ring) + 1;
-
-        // float point_resolution = 0.1 * M_PI/180;
-        // auto distance = sqrt(pow(cluster.average.x,2) + pow(cluster.average.y,2));
-        // // auto payload_w = 2*SQRT2*_payload_size;
-        // // auto payload_h = 2*SQRT2*_payload_size;
-        // auto payload_w = SQRT2 * _payload_size;
-        // auto payload_h = SQRT2 * _payload_size;
-        // 
-        // int num_horizontal_points = 
-        //     std::ceil(payload_w / (distance * tan(point_resolution)));
-        // double HalfVerticalAngle  = 
-        //     std::atan((payload_h / 2) / abs(distance)) * 180 / M_PI;
-
-        // int num_vertical_ring = 0;
-        // for (int i = 0; i < UltraPuckV2::beams; ++i)
-        // {
-        //     if (HalfVerticalAngle > abs(UltraPuckV2::el[i])) 
-        //     {
-        //         num_vertical_ring++;
-        //     }
-        // }
-
         int expected_points = num_vertical_ring * num_horizontal_points;
 
-        
         if ((cluster.data.size() + cluster.edge_points.size()) > expected_points) {
             _result_statistics.cluster_removal.maximum_return ++;
             _result_statistics.remaining_cluster_size--;

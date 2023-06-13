@@ -34,25 +34,11 @@
 #ifndef LIDARTAG_H
 #define LIDARTAG_H
 
-#include <queue>          // std::queue
-#include <string>
-#include <fstream>
-#include <vector>
-#include <memory>
+#include "lidartag_msgs/LiDARTagDetection.h"
+#include "lidartag_msgs/LiDARTagDetectionArray.h"
+#include "types.h"
+#include "thread_pool.h"
 
-#include <ros/ros.h>
-#include <tf/transform_broadcaster.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <visualization_msgs/Marker.h> // Marker
-#include <visualization_msgs/MarkerArray.h> // Marker
-
-
-// threadings
-#include <boost/thread/mutex.hpp>
-#include <tbb/tbb.h>
-
-// To trasnform to pcl format
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -60,19 +46,24 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/ModelCoefficients.h>
-
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <tf/transform_broadcaster.h>
 #include <velodyne_pcl/point_types.h>
 #include <velodyne_pointcloud/pointcloudXYZIRT.h> 
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
+// threadings
+#include <boost/thread/mutex.hpp>
+#include <tbb/tbb.h>
 
-#include "lidartag_msgs/LiDARTagDetection.h"
-#include "lidartag_msgs/LiDARTagDetectionArray.h"
-#include "types.h"
-#include "thread_pool.h"
-
-// #include "mat.h"
-// #include "matrix.h"
-// #include "tensorflow_ros_test/lib.h"
+#include <fstream>
+#include <memory>
+#include <queue>          // std::queue
+#include <string>
+#include <vector>
 
 namespace BipedLab{
     class LiDARTag{
@@ -91,7 +82,6 @@ namespace BipedLab{
             int _valgrind_check; // Debugging with Valgrind
             int _fake_tag;
             int _decode_method; // Which decode methods to use?
-
 
             int _optimization_solver;
             int _decode_mode; 
@@ -127,7 +117,6 @@ namespace BipedLab{
             ros::Publisher _payload3d_pub;
             ros::Publisher _tag_pub;
             ros::Publisher _ini_tag_pub;
-        //     ros::Publisher _index_pub;
             ros::Publisher _cluster_marker_pub;  // cluster markers
             ros::Publisher _boundary_marker_pub; // cluster boundary
             ros::Publisher _id_marker_pub;
@@ -145,17 +134,8 @@ namespace BipedLab{
             int _point_cloud_received; // check if a scan of point cloud has received or not
             int _stop; // Just a switch for exiting this program while using valgrind
 
-            // ros::Publisher DebugPointCheckPub_; // Debug
-            // ros::Publisher DebugBoundaryPointPub_; // Debug
-            // ros::Publisher DebugNoEdgePub_; // Debug
-            // ros::Publisher DebugExtractPayloadPub_; // Debug
-
-            //ros::Publisher TextPub_; // publish text
-            // visualization_msgs::MarkerArray _markers; 
-
             // Queue for pc data
             std::queue<sensor_msgs::PointCloud2ConstPtr> _point_cloud1_queue;
-
 
             // LiDAR parameters
             ros::Time _current_scan_time; // store current time of the lidar scan
@@ -227,18 +207,14 @@ namespace BipedLab{
             lidartag_msgs::LiDARTagDetectionArray _lidartag_pose_array; // an array of apriltags
             lidartag_msgs::LiDARTagDetectionArray detectionsToPub;
 
-
-
             // threadings 
             int _num_threads;
             std::shared_ptr<ThreadPool> _thread_vec;
-
 
             // lock
             boost::mutex _refine_lock;
             boost::mutex _buff_to_pcl_vector_lock;
             boost::mutex _point_cloud1_queue_lock;
-
 
             // NN
             // LoadWeight *NNptr_;
@@ -360,14 +336,11 @@ namespace BipedLab{
              */
             void _pointsPerSquareMeterAtOneMeter();
 
-
             /*
              * A function to get a number of points on a given-distance tag or object
              * from LiDAR analysis
              */
             int _areaPoints(const double &t_distance, const double &t_obj_width, const double &t_obj_height);
-
-
 
             /* [LiDARTag detection]
              * Given lidar pointcloud, this function performs 
@@ -759,16 +732,6 @@ namespace BipedLab{
                     const float &geo_ell,
                     float &score);
 
-
-
-
-
-
-        //     Eigen::VectorXf d_px_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13);
-        //     Eigen::VectorXf d_py_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13);
-        //     Eigen::VectorXf d_pz_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13);
-
-
             /* [Decoder]
              * Create hash table of chosen tag family
              */
@@ -800,15 +763,6 @@ namespace BipedLab{
             void _plotIdealFrame();
             void _plotTagFrame(const ClusterFamily_t &t_cluster);
             visualization_msgs::Marker _visualizeVector(Eigen::Vector3f edge_vector, PointXYZIRT centriod, int t_ID);
-            /* [accumulating temporal cluster]
-            * A function to save temporal clusters data
-            */
-            // void _saveTemporalCluster(const std::vector<ClusterFamily_t> &t_cluster, std::vector<std::vector<pcl::PointCloud<LiDARPoints_t>>> &matData);
-            
-            /* [save points to mat files]
-            * A function to save points as .mat data
-            */
-            // void _saveMatFiles(std::vector<std::vector<pcl::PointCloud<LiDARPoints_t>>>& matData);
             
             // [A function to put clusterFamily to LiDARTagDetectionArray]
             void _detectionArrayPublisher(const ClusterFamily_t &Cluster);
@@ -852,12 +806,6 @@ namespace BipedLab{
                 std::ostream &fplanefit);
 
             void _initFunctionDecoder();
-
-
-            ///
-            // void  _calculateCost(Eigen::Vector3f q, double & costx, double & costy, double & costz);
-            // double _checkCost(double point, double cons1, double cons2);
-            // double _costfunc(const std::vector<double> &x, std::vector<double> &grad, void *func_data);
 
             /*****************************************************
              * not used 
