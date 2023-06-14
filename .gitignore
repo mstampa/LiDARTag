@@ -1,6 +1,8 @@
 build/*
 matlab/paper_data/*
 output/*
+
+.cache/*
 .vscode/*
 
 *.mat

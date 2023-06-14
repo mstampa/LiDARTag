@@ -29,7 +29,7 @@
  */
 
 #ifndef ULTRA_PUCK_H
-#define ULTRA_PuCK_H
+#define ULTRA_PUCK_H
 
 #include <cmath>
 
