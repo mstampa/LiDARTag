@@ -71,14 +71,6 @@ typedef struct PayloadVoting
   PointXYZIRT centroid;
 } PayloadVoting_t;
 
-// velodyne_pointcloud::PointXYZIRT operator+ (const PointXYZIRT& p1, const PointXYZIRT p2) {
-//         PointXYZIRT tmp;
-//         tmp.x = p1.x + p2.x;
-//         tmp.y = p1.y + p2.y;
-//         tmp.z = p1.z + p2.z;
-//         tmp.intensity = p1.intensity + p2.intensity;
-//         return tmp;
-// };
 typedef struct MaxMin
 {
   int min;
@@ -90,29 +82,9 @@ struct angleComparision
 {
   bool operator()(const float& i, const float& j) const
   {
-    // if (std::abs(i - j) > 0.0017)
-    //     return true;
-    // else
-    //     return false;
-    // return (std::abs(i - j) > 0.004);
-    // return (std::abs(i - j) > 0.005);
-    // const int i_int = static_cast<int>(i * 1000);
-    // const int j_int = static_cast<int>(j * 1000);
-    // return i_int < j_int;
-
     float threshold = 0.3;
-    if (std::abs(i - j) < threshold)
-    {
-      return false;
-    }
-    else
-    {
-      return i < j;
-    }
+    return (std::abs(i - j) < threshold ? false : i < j);
   }
-  // bool operator() (const pair<float, float> &lhs, const pair<float,float> &rhs) const{
-  //     return (lhs.second - lhs.first > rhs.second - rhs.first);
-  // }
 };
 
 // Structure for LiDAR system
@@ -120,9 +92,8 @@ typedef struct LiDARSystem
 {
   std::vector<std::vector<int>> point_count_table;  // point per ring  PointCountTable[Scan][ring]
   std::vector<MaxMin_t> max_min_table;              // max min points in a scan
-  std::vector<MaxMin_t> ring_average_table;  // max, min, average points in a ring, examed through out a few seconds
-                                             // std::vector<float> angle_list; // store the angle of each point
-  std::set<float, angleComparision> angle_list;
+  std::vector<MaxMin_t> ring_average_table;      // max, min, average points in a ring, examed through out a few seconds
+  std::set<float, angleComparision> angle_list;  // store the angle of each point
 
   double points_per_square_meter_at_one_meter;  // TODO: only assume place the tag at dense-point area
   double beam_per_vertical_radian;
@@ -209,13 +180,10 @@ typedef struct ClusterFamily
   int bottom_ring;
   PointXYZIRT top_most_point;
   PointXYZIRT bottom_most_point;
-
   PointXYZIRT front_most_point;
   PointXYZIRT back_most_point;
-
   PointXYZIRT right_most_point;
   PointXYZIRT left_most_point;
-
   PointXYZIRT average;                  // Average point
   PointXYZIRT max_intensity;            // Maximux intensity point
   PointXYZIRT min_intensity;            // Minimum intensity point
@@ -255,7 +223,6 @@ typedef struct ClusterFamily
   pcl::PointCloud<LiDARPoints_t> edge_group3;
   pcl::PointCloud<LiDARPoints_t> edge_group4;
 
-  // Eigen::Vector3f NormalVector; // Normal vectors of the payload
   Eigen::Matrix<float, 3, 1, Eigen::DontAlign> normal_vector;
   Eigen::Matrix<float, 3, 3, Eigen::DontAlign> principal_axes;
   QuickDecodeEntry_t entry;
@@ -263,8 +230,7 @@ typedef struct ClusterFamily
   Homogeneous_t pose;
   Homogeneous_t initial_pose;
   tf::Transform transform;
-
-  RKHSDecoding_t rkhs_decoding;  //
+  RKHSDecoding_t rkhs_decoding;
 
   /* VectorXf:
    *          point_on_line.x : the X coordinate of a point on the line
@@ -307,11 +273,11 @@ typedef struct ClusterRemoval
 {
   int minimum_return;
   int maximum_return;
-  int plane_fitting;         // v
-  int plane_outliers;        // v
-  int boundary_point_check;  // v
+  int plane_fitting;
+  int plane_outliers;
+  int boundary_point_check;
   int minimum_ring_points;
-  int no_edge_check;  // v
+  int no_edge_check;
   int line_fitting;
   int pose_optimization;
   int decoding_failure;
@@ -352,16 +318,13 @@ typedef struct Timing
   double pose_optimization_time;
   double store_template_time;
   double payload_decoding_time;
-
   double normal_vector_time;
   double tag_to_robot_time;
 } Timing_t;
 
 typedef struct TimeDecoding
 {
-  // in ms
-  std::chrono::steady_clock::time_point timing;
-
+  std::chrono::steady_clock::time_point timing;  // ms
   double original;
   double matrix;
   double vectorization;

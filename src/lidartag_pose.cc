@@ -17,6 +17,7 @@ double checkCost(double point, double cons1, double cons2)
     return std::min(std::abs(point - cons2), std::abs(point - cons1));
   }
 }
+
 Eigen::VectorXd d_px_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13)
 {
   double t2 = (rpy12 * M_PI) / 1.8e+2;
@@ -52,14 +53,15 @@ Eigen::VectorXd d_py_euler(double x11, double y11, double z11, double rpy11, dou
       (t8 * M_PI * (z11 * t9 + x11 * t6 * t7 - y11 * t6 * t10)) / 1.8e+2,
       x11 * ((t5 * t7 * M_PI) / 1.8e+2 - (t8 * t9 * t10 * M_PI) / 1.8e+2) -
           y11 * ((t5 * t10 * M_PI) / 1.8e+2 + (t7 * t8 * t9 * M_PI) / 1.8e+2);
+
   return d_py;
 }
 
 Eigen::VectorXd d_pz_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13)
 {
-  double t2 = (rpy11 * M_PI) / 1.8e+2;
-  double t3 = (rpy12 * M_PI) / 1.8e+2;
-  double t4 = (rpy13 * M_PI) / 1.8e+2;
+  double t2 = (rpy11 * M_PI) / 180.0;
+  double t3 = (rpy12 * M_PI) / 180.0;
+  double t4 = (rpy13 * M_PI) / 180.0;
   double t5 = std::cos(t2);
   double t6 = std::cos(t3);
   double t7 = std::cos(t4);
@@ -86,20 +88,20 @@ void d_px_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t5 = utils::get_sign(r11);
   double t6 = utils::get_sign(r12);
   double t7 = utils::get_sign(r13);
-  double t8 = std::pow(r12, 2);
-  double t9 = std::pow(r13, 2);
-  double t10 = std::pow(t2, 2);
-  double t11 = std::pow(t3, 2);
-  double t12 = std::pow(t4, 2);
+  double t8 = r12 * r12;
+  double t9 = r13 * r13;
+  double t10 = t2 * t2;
+  double t11 = t3 * t3;
+  double t12 = t4 * t4;
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
   double t17 = std::sqrt(t14);
-  double t16 = std::pow(t15, 2);
+  double t16 = t15 * t15;
   double t18 = 1 / t17;
   double t20 = std::cos(t17);
   double t21 = std::sin(t17);
-  double t19 = std::pow(t18, 3);
+  double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
   double t24 = r11 * t15 * t22;
@@ -135,20 +137,20 @@ void d_py_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t5 = utils::get_sign(r11);
   double t6 = utils::get_sign(r12);
   double t7 = utils::get_sign(r13);
-  double t8 = std::pow(r11, 2);
-  double t9 = std::pow(r13, 2);
-  double t10 = std::pow(t2, 2);
-  double t11 = std::pow(t3, 2);
-  double t12 = std::pow(t4, 2);
+  double t8 = r11 * r11;
+  double t9 = r13 * r13;
+  double t10 = t2 * t2;
+  double t11 = t3 * t3;
+  double t12 = t4 * t4;
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
   double t17 = std::sqrt(t14);
-  double t16 = std::pow(t15, 2);
+  double t16 = t15 * t15;
   double t18 = 1 / t17;
   double t20 = std::cos(t17);
   double t21 = std::sin(t17);
-  double t19 = std::pow(t18, 3);
+  double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
   double t24 = r12 * t15 * t22;
@@ -184,20 +186,20 @@ void d_pz_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t5 = utils::get_sign(r11);
   double t6 = utils::get_sign(r12);
   double t7 = utils::get_sign(r13);
-  double t8 = std::pow(r11, 2);
-  double t9 = std::pow(r12, 2);
-  double t10 = std::pow(t2, 2);
-  double t11 = std::pow(t3, 2);
-  double t12 = std::pow(t4, 2);
+  double t8 = r11 * r11;
+  double t9 = r12 * r12;
+  double t10 = t2 * t2;
+  double t11 = t3 * t3;
+  double t12 = t4 * t4;
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
   double t17 = std::sqrt(t14);
-  double t16 = std::pow(t15, 2);
+  double t16 = t15 * t15;
   double t18 = 1 / t17;
   double t20 = std::cos(t17);
   double t21 = std::sin(t17);
-  double t19 = std::pow(t18, 3);
+  double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
   double t24 = r13 * t15 * t22;
@@ -274,9 +276,7 @@ double getCost(const Eigen::Vector4f& template_bound, Eigen::MatrixXf& transform
 {
   Eigen::MatrixXf transfomed_cost_ary = (transformed_points.cwiseAbs()).colwise() - template_bound;
   Eigen::Vector3f cost_vec = transfomed_cost_ary.cwiseMax(0).rowwise().sum();
-  double cost = cost_vec[0] + cost_vec[1] + cost_vec[2];
-
-  return cost;
+  return cost_vec[0] + cost_vec[1] + cost_vec[2];
 }
 
 double evaluateCost(const Eigen::Matrix4f& H, const Eigen::MatrixXf& points, const Eigen::Vector4f& template_bound,
@@ -299,7 +299,6 @@ double computeCost_lie(const std::vector<double>& x, std::vector<double>& grad, 
   H.topRightCorner(3, 1) << x[0], x[1], x[2];
 
   Eigen::MatrixXf transfomed_points_mat;
-
   double cost = evaluateCost(H, (*d).topLeftCorner(4, num_points), (*d).col(num_points), transfomed_points_mat);
 
   Eigen::Matrix<float, 1, Eigen::Dynamic> transformed_x_ind =
@@ -363,7 +362,6 @@ double computeCost_euler(const std::vector<double>& x, std::vector<double>& grad
   H.topRightCorner(3, 1) << x[0], x[1], x[2];
 
   Eigen::MatrixXf transfomed_points_mat;
-
   double cost = evaluateCost(H, (*d).topLeftCorner(4, num_points), (*d).col(num_points), transfomed_points_mat);
 
   Eigen::Matrix<float, 1, Eigen::Dynamic> transformed_x_ind =
@@ -455,7 +453,6 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
   {
     status = -2;
     ROS_DEBUG_STREAM("Status: " << false);
-
     return status;
   }
 

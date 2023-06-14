@@ -47,8 +47,6 @@ find_package(Eigen3 3.4.0 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 message(STATUS "================================== EIGEN (internal): " ${EIGEN3_VERSION})
 
-#find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS 

@@ -72,8 +72,6 @@ double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
 double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
                            const std::chrono::steady_clock::time_point& t_start);
 
-// bool angleComparision (float i, float j);
-
 /*
  * Generic function to find an element in vector and also its position.
  * It returns a pair of bool & int i.e.
@@ -182,24 +180,16 @@ T blockMatrix(int t_n, ...);
 
 // template <class T>
 Eigen::Matrix4d poseToEigenMatrix(const geometry_msgs::Pose& t_pose);
-// Eigen::Matrix4d poseToEigenMatrix(const T &pose);
 
 template <class T>
 Eigen::Matrix3d qToR(const T& t_pose);
 
 Eigen::Matrix3d qToR(const Eigen::Vector3f& t_pose);
 
-// q1q2 = q2q1q2^-1
-Eigen::Matrix3d qMultiplication(const double& t_q1_w, const Eigen::Vector3f& t_q1, const double& t_q2_w,
-                                const Eigen::Vector3f& t_q2);
-
 template <class T>
 bool goodNumber(T t_number)
 {
-  if (std::isinf(t_number) || std::isnan(t_number))
-    return false;
-  else
-    return true;
+  return !std::isinf(t_number) && !std::isnan(t_number);
 }
 
 /*
@@ -240,8 +230,6 @@ void removeIndicesFromVector(C<T>& c, std::vector<int>& rm)
 }
 
 std::vector<int> complementOfSet(const std::vector<int>& set, std::size_t n);
-// std::ostream& operator<<(std::ostream& os, const PointXYZIRT& p);
-float dot_product(Eigen::Vector3f v1, Eigen::Vector3f v2);
 
 Eigen::Vector3f cross_product(Eigen::Vector3f v1, Eigen::Vector3f v2);
 
@@ -290,9 +278,7 @@ void printVector(const std::vector<T>& vec)
 template <typename T>
 std::vector<typename T::Scalar> convertEigenToSTDVector(const T& mat)
 {
-  std::vector<typename T::Scalar> vec(mat.data(), mat.data() + mat.rows() * mat.cols());
-
-  return vec;
+  return std::vector<typename T::Scalar>(mat.data(), mat.data() + mat.rows() * mat.cols());
 }
 
 Eigen::MatrixXf convertXYZIToHomogeneous(const Eigen::MatrixXf& mat_xyzi);
@@ -303,7 +289,6 @@ Eigen::Matrix3f computeRotX(T deg)
   T rad = deg2Rad(deg);
   Eigen::Matrix3f rotx;
   rotx << 1, 0, 0, 0, std::cos(rad), -std::sin(rad), 0, std::sin(rad), std::cos(rad);
-
   return rotx;
 }
 
@@ -313,7 +298,6 @@ Eigen::Matrix3f computeRotY(T deg)
   T rad = deg2Rad(deg);
   Eigen::Matrix3f roty;
   roty << std::cos(rad), 0, std::sin(rad), 0, 1, 0, -std::sin(rad), 0, std::cos(rad);
-
   return roty;
 }
 
@@ -323,7 +307,6 @@ Eigen::Matrix3f computeRotZ(T deg)
   T rad = deg2Rad(deg);
   Eigen::Matrix3f rotz;
   rotz << std::cos(rad), -std::sin(rad), 0, std::sin(rad), std::cos(rad), 0, 0, 0, 1;
-
   return rotz;
 }
 
@@ -336,60 +319,8 @@ void constructConvexHull(const Eigen::MatrixXf& P, Eigen::MatrixXf& convex_hull)
 
 float computePolygonArea(const Eigen::MatrixXf& vertices);
 
-// float computeMedian(std::vector<float> vec);
-// template <typename T>
-// T computeMedian(std::vector<T> &vec);
-// template <typename T>
-// T computeMedian(std::vector<T> &vec){
-//     assert(vec.size()!=0);
-//     if (vec.size() % 2 == 0) {
-//         const auto median_it1 = vec.begin() + vec.size() / 2 - 1;
-//         const auto median_it2 = vec.begin() + vec.size() / 2;
-
-//         std::nth_element(vec.begin(), median_it1 , vec.end());
-//         const T e1 = *median_it1;
-
-//         std::nth_element(vec.begin(), median_it2 , vec.end());
-//         const T e2 = *median_it2;
-
-//         return (e1 + e2) / 2;
-
-//     } else {
-//         const auto median_it = vec.begin() + vec.size() / 2;
-//         std::nth_element(vec.begin(), median_it , vec.end());
-
-//         return *median_it;
-//     }
-// }
-
-// auto computeMedian(const std::vector<float> &vec);
-// template <typename T>
-// T computeMedian(const std::vector<T> &eigen_vec);
-// template <typename T>
-// T computeMedian(const std::vector<T> &vec){
-//     //assert(eigen_vec.size()!=0);
-//     //std::vector<float> vec(eigen_vec.data(), eigen_vec.data() + eigen_vec.size());
-//     assert(vec.size()!=0);
-//     if (vec.size() % 2 == 0) {
-//         const T median_it1 = vec.begin() + vec.size() / 2 - 1;
-//         const T median_it2 = vec.begin() + vec.size() / 2;
-
-//         std::nth_element(vec.begin(), median_it1 , vec.end());
-//         const T e1 = *median_it1;
-
-//         std::nth_element(vec.begin(), median_it2 , vec.end());
-//         const T e2 = *median_it2;
-
-//         return (e1 + e2) / 2;
-
-//     } else {
-//         const T median_it = vec.begin() + vec.size() / 2;
-//         std::nth_element(vec.begin(), median_it , vec.end());
-
-//         return *median_it;
-//     }
-// }
-
 }  // namespace utils
+
 }  // namespace BipedLab
+
 #endif

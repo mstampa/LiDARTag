@@ -656,11 +656,6 @@ std::vector<int> complementOfSet(const std::vector<int>& set, std::size_t n)
   return complement;
 }
 
-float dot_product(Eigen::Vector3f v1, Eigen::Vector3f v2)
-{
-  return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
-}
-
 Eigen::Vector3f cross_product(Eigen::Vector3f v1, Eigen::Vector3f v2)
 {
   Eigen::Vector3f res;

@@ -54,13 +54,10 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
     top_most_point.z = top_most_point.z + _linkage_threshold;
     PointXYZIRT bottom_most_point = point.point;
     bottom_most_point.z -= _linkage_threshold;
-
     PointXYZIRT front_most_point = point.point;
     front_most_point.x += _linkage_threshold;
-
     PointXYZIRT back_most_point = point.point;
     back_most_point.x -= _linkage_threshold;
-
     PointXYZIRT right_most_point = point.point;
     right_most_point.y -= _linkage_threshold;
     PointXYZIRT left_most_point = point.point;
@@ -78,7 +75,7 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
                                         left_most_point,
                                         point.point };
 
-    MaxMin_t initial_value;  // = {(int)1e8, 0, -1};
+    MaxMin_t initial_value;
     initial_value.min = (int)1e8;
     initial_value.average = (int)-1;
     initial_value.max = (int)-1;
@@ -86,10 +83,8 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
     current_cluster.max_min_index_of_each_ring.resize(_beam_num, initial_value);
     current_cluster.max_min_index_of_each_ring[point.point.ring].max = point.index;
     current_cluster.max_min_index_of_each_ring[point.point.ring].min = point.index;
-
     current_cluster.max_intensity = point.point;
     current_cluster.min_intensity = point.point;
-
     current_cluster.edge_points.push_back(point);
     cluster_buff.push_back(current_cluster);
     return;
@@ -109,7 +104,6 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
       if (!(new_cluster->flag))
       {
         delete new_cluster;
-
         return;
       }
     }
@@ -124,12 +118,10 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
       top_most_point.z += _linkage_threshold;
       PointXYZIRT bottom_most_point = point.point;
       bottom_most_point.z -= _linkage_threshold;
-
       PointXYZIRT front_most_point = point.point;
       front_most_point.x += _linkage_threshold;
       PointXYZIRT back_most_point = point.point;
       back_most_point.x -= _linkage_threshold;
-
       PointXYZIRT right_most_point = point.point;
       right_most_point.y -= _linkage_threshold;
       PointXYZIRT left_most_point = point.point;
@@ -148,10 +140,8 @@ void LiDARTag::_clusterClassifier(const LiDARPoints_t& point, vector<ClusterFami
       new_cluster->new_cluster.max_min_index_of_each_ring.resize(_beam_num, initial_value);
       new_cluster->new_cluster.max_min_index_of_each_ring[point.point.ring].max = point.index;
       new_cluster->new_cluster.max_min_index_of_each_ring[point.point.ring].min = point.index;
-
       new_cluster->new_cluster.max_intensity = point.point;
       new_cluster->new_cluster.min_intensity = point.point;
-
       new_cluster->new_cluster.edge_points.push_back(point);
       cluster_buff.push_back(new_cluster->new_cluster);
     }

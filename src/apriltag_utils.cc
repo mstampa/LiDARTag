@@ -133,7 +133,6 @@ void QuickDecodeInit(BipedLab::GrizTagFamily_t* family, int maxhamming)
   BipedLab::QuickDecode_t* qd = new BipedLab::QuickDecode_t;
 
   int capacity = family->ncodes;
-
   int nbits = family->d * family->d;
 
   if (maxhamming >= 1)
@@ -300,8 +299,6 @@ void QuickDecodeCodeword(BipedLab::GrizTagFamily_t* tf, uint64_t rcode, BipedLab
 	for (int bucket = rcode % qd->nentries; qd->entries[bucket].rcode != UINT64_MAX;
 		 bucket = (bucket + 1) % qd->nentries)
 	{
-	  // std::cout << "bucket: " << bucket << std::endl;
-
 	  if (qd->entries[bucket].rcode == rcode)
 	  {
 		*entry = qd->entries[bucket];

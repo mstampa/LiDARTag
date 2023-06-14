@@ -32,14 +32,10 @@
 
 #include <ros/ros.h>
 
-using namespace std;
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "lidar_tag_node");
   BipedLab::LiDARTag lidar_tag;
-
-  cout << "Done!" << endl;
-
+  std::cout << "Done!" << std::endl;
   return 0;
 }

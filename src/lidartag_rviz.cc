@@ -28,10 +28,10 @@
  * WEBSITE: https://www.brucerobot.com/
  */
 
-#include <pcl/common/intersections.h>
-
-#include <ros/package.h>  // package
 #include "lidartag.h"
+
+#include <pcl/common/intersections.h>
+#include <ros/package.h>
 
 #include <iostream>
 #include <string>
@@ -62,13 +62,9 @@ void LiDARTag::_assignMarker(visualization_msgs::Marker& Marker, const uint32_t 
   Marker.pose.orientation.w = 1.0;
   Marker.text = Text;
   Marker.lifetime = ros::Duration(_sleep_time_for_vis);  // should disappear along with updateing rate
-
-  // Set the scale of the marker -- 1x1x1 here means 1m on a side
   Marker.scale.x = Size;
   Marker.scale.y = Size;
   Marker.scale.z = Size;
-
-  // Set the color -- be sure to set alpha to something non-zero!
   Marker.color.r = r;
   Marker.color.g = g;
   Marker.color.b = b;
@@ -88,11 +84,10 @@ void LiDARTag::_assignVectorMarker(visualization_msgs::Marker& Marker, const uin
 
   Marker.text = Text;
   Marker.lifetime = ros::Duration(_sleep_time_for_vis);  // should disappear along with updateing rate
-  // Set the scale of the marker -- 1x1x1 here means 1m on a side
   geometry_msgs::Point p1;
-  p1.x = 0;  // centriod.x;
-  p1.y = 0;  // centriod.y;
-  p1.z = 0;  // centriod.z;
+  p1.x = 0;  // centroid.x;
+  p1.y = 0;  // centroid.y;
+  p1.z = 0;  // centroid.z;
   Marker.points.push_back(p1);
 
   geometry_msgs::Point p2;
@@ -235,6 +230,7 @@ visualization_msgs::Marker LiDARTag::_visualizeVector(Eigen::Vector3f edge_vecto
 
   return edge;
 }
+
 /*
  * A function to prepare for displaying results in rviz
  */
@@ -260,16 +256,13 @@ void LiDARTag::_clusterToPclVectorAndMarkerPublisher(
   int cluster_pc_id = 1;
 
   int PointsInClusters = 0;
-
   int Clustercount = 0;
   for (int Key = 0; Key < Cluster.size(); ++Key)
   {
     if (Cluster[Key].valid != 1)
       continue;
-    LiDARTag::_plotTagFrame(Cluster[Key]);
 
-    visualization_msgs::Marker Marker;
-    visualization_msgs::Marker BoundaryMarker;
+    LiDARTag::_plotTagFrame(Cluster[Key]);
 
     // pick a random color for each cluster
     double r = (double)rand() / RAND_MAX;
@@ -277,6 +270,7 @@ void LiDARTag::_clusterToPclVectorAndMarkerPublisher(
     double b = (double)rand() / RAND_MAX;
 
     // Draw boundary marker of each cluster
+    visualization_msgs::Marker BoundaryMarker;
     LiDARTag::_assignMarker(BoundaryMarker, visualization_msgs::Marker::CUBE,
                             "Boundary" + to_string(Cluster[Key].cluster_id), r, g, b, Cluster[Key].top_most_point, 0,
                             0.02);
@@ -401,17 +395,10 @@ void LiDARTag::_clusterToPclVectorAndMarkerPublisher(
       Eigen::Vector4f EigenPoint;
       PointXYZIRT point;  // just for conversion
 
-      for (int i = 0; i < 4; ++i)
-      {  // 4 corners
-        // Corners
-        if (i != 3)
-        {
-          pcl::lineWithLineIntersection(Cluster[Key].line_coeff[i], Cluster[Key].line_coeff[i + 1], EigenPoint, 1e-2);
-        }
-        else
-        {
-          pcl::lineWithLineIntersection(Cluster[Key].line_coeff[i], Cluster[Key].line_coeff[0], EigenPoint, 1e-2);
-        }
+      for (int i = 0; i < 4; ++i)  // 4 corners
+      {
+        pcl::lineWithLineIntersection(Cluster[Key].line_coeff[i], Cluster[Key].line_coeff[(i != 3) ? i + 1 : 0],
+                                      EigenPoint, 1e-2);
 
         LiDARTag::_eigenVectorToPointXYZIRT(EigenPoint, point);
         LiDARTag::_assignMarker(PayloadMarker, visualization_msgs::Marker::SPHERE,
@@ -431,6 +418,7 @@ void LiDARTag::_clusterToPclVectorAndMarkerPublisher(
       }
     }
 
+    visualization_msgs::Marker Marker;
     for (int i = 0; i < Cluster[Key].data.size(); ++i)
     {
       if (Cluster[Key].data[i].valid != 1)

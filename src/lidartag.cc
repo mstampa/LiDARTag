@@ -701,7 +701,7 @@ void LiDARTag::_analyzeLiDARDevice()
  */
 void LiDARTag::_pointsPerSquareMeterAtOneMeter()
 {
-  double system_average;
+  double system_average = 0;
   for (auto i = _LiDAR_system.ring_average_table.begin(); i != _LiDAR_system.ring_average_table.end(); ++i)
   {
     system_average += (*i).average;

@@ -40,9 +40,8 @@
 #include <velodyne_pcl/point_types.h>
 #include <velodyne_pointcloud/pointcloudXYZIRT.h>
 
+#include <cmath>
 #include <fstream>
-
-#define SQRT2 1.41421356237
 
 using namespace std;
 
@@ -57,17 +56,10 @@ namespace BipedLab
 bool LiDARTag::_clusterPointsCheck(ClusterFamily_t& Cluster)
 {
   auto distance = sqrt(pow(Cluster.average.x, 2) + pow(Cluster.average.y, 2));
-  int maxPoints = LiDARTag::_areaPoints(distance, _payload_size * SQRT2, _payload_size * SQRT2);
-  int minPoints = LiDARTag::_areaPoints(distance, _payload_size / SQRT2, _payload_size / SQRT2);
+  int maxPoints = LiDARTag::_areaPoints(distance, _payload_size * M_SQRT2, _payload_size * M_SQRT2);
+  int minPoints = LiDARTag::_areaPoints(distance, _payload_size / M_SQRT2, _payload_size / M_SQRT2);
 
-  if (Cluster.data.size() < minPoints)
-  {
-    return false;
-  }
-  else
-  {
-    return true;
-  }
+  return Cluster.data.size() >= minPoints;
 }
 
 /*
@@ -88,7 +80,6 @@ int LiDARTag::_areaPoints(const double& Distance, const double& ObjWidth, const 
   }
 
   return NumOfVerticalRing * NumOfHorizontalPoints;
-  ;
 }
 
 /*
@@ -97,12 +88,12 @@ int LiDARTag::_areaPoints(const double& Distance, const double& ObjWidth, const 
  */
 void LiDARTag::_maxPointsCheck(ClusterFamily_t& cluster)
 {
-  int ring = std::round(_beam_num / 2);
+  int ring = round(_beam_num / 2);
   double point_resolution = 2 * M_PI / _LiDAR_system.ring_average_table[ring].average;
-  auto distance = std::sqrt(pow(cluster.average.x, 2) + pow(cluster.average.y, 2) + pow(cluster.average.z, 2));
-  float payload_w = SQRT2 * _payload_size;
-  int num_horizontal_points = std::ceil(payload_w / (distance * std::sin(point_resolution)));
-  int num_vertical_ring = std::abs(cluster.top_ring - cluster.bottom_ring) + 1;
+  auto distance = sqrt(pow(cluster.average.x, 2) + pow(cluster.average.y, 2) + pow(cluster.average.z, 2));
+  float payload_w = M_SQRT2 * _payload_size;
+  int num_horizontal_points = ceil(payload_w / (distance * sin(point_resolution)));
+  int num_vertical_ring = abs(cluster.top_ring - cluster.bottom_ring) + 1;
   int expected_points = num_vertical_ring * num_horizontal_points;
 
   if ((cluster.data.size() + cluster.edge_points.size()) > expected_points)
@@ -119,10 +110,7 @@ void LiDARTag::_maxPointsCheck(ClusterFamily_t& cluster)
     ROS_DEBUG_STREAM("Distance : " << distance << ", num_horizontal_points: " << num_horizontal_points);
     ROS_DEBUG_STREAM("Expected Points: " << expected_points);
     ROS_DEBUG_STREAM("Actual Points: " << cluster.data.size() + cluster.edge_points.size());
-    if ((cluster.data.size() + cluster.edge_points.size()) > expected_points)
-      ROS_DEBUG_STREAM("Status: " << false);
-    else
-      ROS_DEBUG_STREAM("Status: " << true);
+    ROS_DEBUG_STREAM("Status: " << (cluster.data.size() + cluster.edge_points.size() <= expected_points));
   }
 }
 
@@ -151,7 +139,6 @@ bool LiDARTag::_rejectWithPlanarCheck(ClusterFamily_t& cluster, pcl::PointIndice
 
   // Create segmentation object
   pcl::SACSegmentation<pcl::PointXYZ> seg;
-
   // Optional
   seg.setOptimizeCoefficients(true);
   // Mandatory
@@ -166,11 +153,12 @@ bool LiDARTag::_rejectWithPlanarCheck(ClusterFamily_t& cluster, pcl::PointIndice
   {
     ROS_DEBUG_STREAM("==== _rejectWithPlanarCheck ====");
     float distance = std::sqrt(pow(cluster.average.x, 2) + pow(cluster.average.y, 2) + pow(cluster.average.z, 2));
-    ROS_DEBUG_STREAM("Distance : " << distance);
+    ROS_DEBUG_STREAM("Distance: " << distance);
     ROS_DEBUG_STREAM("Actual Points: " << cluster.data.size() + cluster.edge_points.size());
-    ROS_DEBUG_STREAM("Inliers     : " << inliers->indices.size());
-    ROS_DEBUG_STREAM("Outliers    : " << cluster.data.size() - inliers->indices.size());
+    ROS_DEBUG_STREAM("Inliers: " << inliers->indices.size());
+    ROS_DEBUG_STREAM("Outliers: " << cluster.data.size() - inliers->indices.size());
   }
+
   if (inliers->indices.size() == 0)
   {
     if (_debug_info)
@@ -180,12 +168,12 @@ bool LiDARTag::_rejectWithPlanarCheck(ClusterFamily_t& cluster, pcl::PointIndice
     }
     _result_statistics.cluster_removal.plane_fitting++;
     _result_statistics.remaining_cluster_size--;
-
     return false;
   }
 
   if (_debug_info)
     ROS_DEBUG_STREAM("Status: " << true);
+
   if (_log_data)
   {
     fplanefit << "Successfully fit plane!" << endl;
