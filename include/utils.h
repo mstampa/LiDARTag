@@ -101,18 +101,6 @@ std::string tranferToLowercase(std::string& t_data);
 
 void pressEnterToContinue();
 
-template <typename T>
-T deg2Rad(T t_degree)
-{
-  return t_degree * M_PI / 180;
-}
-
-template <typename T>
-T rad2Deg(T t_radian)
-{
-  return t_radian * 180 / M_PI;
-}
-
 bool isRotationMatrix(Eigen::Matrix3f& t_R);
 Eigen::Vector3f rotationMatrixToEulerAngles(Eigen::Matrix3f& t_R);
 
@@ -286,7 +274,7 @@ Eigen::MatrixXf convertXYZIToHomogeneous(const Eigen::MatrixXf& mat_xyzi);
 template <typename T>
 Eigen::Matrix3f computeRotX(T deg)
 {
-  T rad = deg2Rad(deg);
+  T rad = DEG2RAD(deg);
   Eigen::Matrix3f rotx;
   rotx << 1, 0, 0, 0, std::cos(rad), -std::sin(rad), 0, std::sin(rad), std::cos(rad);
   return rotx;
@@ -295,7 +283,7 @@ Eigen::Matrix3f computeRotX(T deg)
 template <typename T>
 Eigen::Matrix3f computeRotY(T deg)
 {
-  T rad = deg2Rad(deg);
+  T rad = DEG2RAD(deg);
   Eigen::Matrix3f roty;
   roty << std::cos(rad), 0, std::sin(rad), 0, 1, 0, -std::sin(rad), 0, std::cos(rad);
   return roty;
@@ -304,7 +292,7 @@ Eigen::Matrix3f computeRotY(T deg)
 template <typename T>
 Eigen::Matrix3f computeRotZ(T deg)
 {
-  T rad = deg2Rad(deg);
+  T rad = DEG2RAD(deg);
   Eigen::Matrix3f rotz;
   rotz << std::cos(rad), -std::sin(rad), 0, std::sin(rad), std::cos(rad), 0, 0, 0, 1;
   return rotz;

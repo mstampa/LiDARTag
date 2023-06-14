@@ -3,91 +3,91 @@
 
 #include <nlopt.hpp>
 #include <iostream>
+#include <pcl/pcl_macros.h>
 
 using namespace std;
 
 namespace BipedLab
 {
+using namespace utils;
+
 double checkCost(double point, double cons1, double cons2)
 {
   if (point >= cons1 && point <= cons2)
     return 0;
   else
   {
-    return std::min(std::abs(point - cons2), std::abs(point - cons1));
+    return min(abs(point - cons2), abs(point - cons1));
   }
 }
 
 Eigen::VectorXd d_px_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13)
 {
-  double t2 = (rpy12 * M_PI) / 1.8e+2;
-  double t3 = (rpy13 * M_PI) / 1.8e+2;
-  double t4 = std::cos(t2);
-  double t5 = std::cos(t3);
-  double t6 = std::sin(t2);
-  double t7 = std::sin(t3);
+  double t2 = DEG2RAD(rpy12);
+  double t3 = DEG2RAD(rpy13);
+  double t4 = cos(t2);
+  double t5 = cos(t3);
+  double t6 = sin(t2);
+  double t7 = sin(t3);
 
   Eigen::VectorXd d_px(6);
-  d_px << 1.0, 0.0, 0.0, 0.0,
-      (z11 * t4 * M_PI) / 1.8e+2 - (x11 * t5 * t6 * M_PI) / 1.8e+2 + (y11 * t6 * t7 * M_PI) / 1.8e+2,
+  d_px << 1.0, 0.0, 0.0, 0.0, DEG2RAD(z11 * t4) - DEG2RAD(x11 * t5 * t6) + DEG2RAD(y11 * t6 * t7),
       t4 * M_PI * (x11 * t7 + y11 * t5) * (-1.0 / 1.8e+2);
   return d_px;
 }
 
 Eigen::VectorXd d_py_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13)
 {
-  double t2 = (rpy11 * M_PI) / 1.8e+2;
-  double t3 = (rpy12 * M_PI) / 1.8e+2;
-  double t4 = (rpy13 * M_PI) / 1.8e+2;
-  double t5 = std::cos(t2);
-  double t6 = std::cos(t3);
-  double t7 = std::cos(t4);
-  double t8 = std::sin(t2);
-  double t9 = std::sin(t3);
-  double t10 = std::sin(t4);
+  double t2 = DEG2RAD(rpy11);
+  double t3 = DEG2RAD(rpy12);
+  double t4 = DEG2RAD(rpy13);
+  double t5 = cos(t2);
+  double t6 = cos(t3);
+  double t7 = cos(t4);
+  double t8 = sin(t2);
+  double t9 = sin(t3);
+  double t10 = sin(t4);
 
   Eigen::VectorXd d_py(6);
   d_py << 0.0, 1.0, 0.0,
-      -x11 * ((t8 * t10 * M_PI) / 1.8e+2 - (t5 * t7 * t9 * M_PI) / 1.8e+2) -
-          y11 * ((t7 * t8 * M_PI) / 1.8e+2 + (t5 * t9 * t10 * M_PI) / 1.8e+2) - (z11 * t5 * t6 * M_PI) / 1.8e+2,
-      (t8 * M_PI * (z11 * t9 + x11 * t6 * t7 - y11 * t6 * t10)) / 1.8e+2,
-      x11 * ((t5 * t7 * M_PI) / 1.8e+2 - (t8 * t9 * t10 * M_PI) / 1.8e+2) -
-          y11 * ((t5 * t10 * M_PI) / 1.8e+2 + (t7 * t8 * t9 * M_PI) / 1.8e+2);
+      -x11 * (DEG2RAD(t8 * t10) - DEG2RAD(t5 * t7 * t9)) - y11 * (DEG2RAD(t7 * t8) + DEG2RAD(t5 * t9 * t10)) -
+          DEG2RAD(z11 * t5 * t6),
+      DEG2RAD(t8 * (z11 * t9 + x11 * t6 * t7 - y11 * t6 * t10)),
+      x11 * (DEG2RAD(t5 * t7) - DEG2RAD(t8 * t9 * t10)) - y11 * (DEG2RAD(t5 * t10) + DEG2RAD(t7 * t8 * t9));
 
   return d_py;
 }
 
 Eigen::VectorXd d_pz_euler(double x11, double y11, double z11, double rpy11, double rpy12, double rpy13)
 {
-  double t2 = (rpy11 * M_PI) / 180.0;
-  double t3 = (rpy12 * M_PI) / 180.0;
-  double t4 = (rpy13 * M_PI) / 180.0;
-  double t5 = std::cos(t2);
-  double t6 = std::cos(t3);
-  double t7 = std::cos(t4);
-  double t8 = std::sin(t2);
-  double t9 = std::sin(t3);
-  double t10 = std::sin(t4);
+  double t2 = DEG2RAD(rpy11);
+  double t3 = DEG2RAD(rpy12);
+  double t4 = DEG2RAD(rpy13);
+  double t5 = cos(t2);
+  double t6 = cos(t3);
+  double t7 = cos(t4);
+  double t8 = sin(t2);
+  double t9 = sin(t3);
+  double t10 = sin(t4);
 
   Eigen::VectorXd d_pz(6);
   d_pz << 0.0, 0.0, 1.0,
-      x11 * ((t5 * t10 * M_PI) / 1.8e+2 + (t7 * t8 * t9 * M_PI) / 1.8e+2) +
-          y11 * ((t5 * t7 * M_PI) / 1.8e+2 - (t8 * t9 * t10 * M_PI) / 1.8e+2) - (z11 * t6 * t8 * M_PI) / 1.8e+2,
+      x11 * (DEG2RAD(t5 * t10) + DEG2RAD(t7 * t8 * t9)) + y11 * (DEG2RAD(t5 * t7) - DEG2RAD(t8 * t9 * t10)) -
+          DEG2RAD(z11 * t6 * t8),
       t5 * M_PI * (z11 * t9 + x11 * t6 * t7 - y11 * t6 * t10) * (-1.0 / 1.8e+2),
-      x11 * ((t7 * t8 * M_PI) / 1.8e+2 + (t5 * t9 * t10 * M_PI) / 1.8e+2) -
-          y11 * ((t8 * t10 * M_PI) / 1.8e+2 - (t5 * t7 * t9 * M_PI) / 1.8e+2);
+      x11 * (DEG2RAD(t7 * t8) + DEG2RAD(t5 * t9 * t10)) - y11 * (DEG2RAD(t8 * t10) - DEG2RAD(t5 * t7 * t9));
   return d_pz;
 }
 
 void d_px_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Eigen::MatrixXf& Z1, const double& r11,
                   const double& r12, const double& r13, Eigen::MatrixXf& dx_mat)
 {
-  double t2 = std::abs(r11);
-  double t3 = std::abs(r12);
-  double t4 = std::abs(r13);
-  double t5 = utils::get_sign(r11);
-  double t6 = utils::get_sign(r12);
-  double t7 = utils::get_sign(r13);
+  double t2 = abs(r11);
+  double t3 = abs(r12);
+  double t4 = abs(r13);
+  double t5 = get_sign(r11);
+  double t6 = get_sign(r12);
+  double t7 = get_sign(r13);
   double t8 = r12 * r12;
   double t9 = r13 * r13;
   double t10 = t2 * t2;
@@ -96,11 +96,11 @@ void d_px_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
-  double t17 = std::sqrt(t14);
+  double t17 = sqrt(t14);
   double t16 = t15 * t15;
   double t18 = 1 / t17;
-  double t20 = std::cos(t17);
-  double t21 = std::sin(t17);
+  double t20 = cos(t17);
+  double t21 = sin(t17);
   double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
@@ -131,12 +131,12 @@ void d_px_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
 void d_py_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Eigen::MatrixXf& Z1, const double& r11,
                   const double& r12, const double& r13, Eigen::MatrixXf& dy_mat)
 {
-  double t2 = std::abs(r11);
-  double t3 = std::abs(r12);
-  double t4 = std::abs(r13);
-  double t5 = utils::get_sign(r11);
-  double t6 = utils::get_sign(r12);
-  double t7 = utils::get_sign(r13);
+  double t2 = abs(r11);
+  double t3 = abs(r12);
+  double t4 = abs(r13);
+  double t5 = get_sign(r11);
+  double t6 = get_sign(r12);
+  double t7 = get_sign(r13);
   double t8 = r11 * r11;
   double t9 = r13 * r13;
   double t10 = t2 * t2;
@@ -145,11 +145,11 @@ void d_py_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
-  double t17 = std::sqrt(t14);
+  double t17 = sqrt(t14);
   double t16 = t15 * t15;
   double t18 = 1 / t17;
-  double t20 = std::cos(t17);
-  double t21 = std::sin(t17);
+  double t20 = cos(t17);
+  double t21 = sin(t17);
   double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
@@ -180,12 +180,12 @@ void d_py_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
 void d_pz_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Eigen::MatrixXf& Z1, const double& r11,
                   const double& r12, const double& r13, Eigen::MatrixXf& dz_mat)
 {
-  double t2 = std::abs(r11);
-  double t3 = std::abs(r12);
-  double t4 = std::abs(r13);
-  double t5 = utils::get_sign(r11);
-  double t6 = utils::get_sign(r12);
-  double t7 = utils::get_sign(r13);
+  double t2 = abs(r11);
+  double t3 = abs(r12);
+  double t4 = abs(r13);
+  double t5 = get_sign(r11);
+  double t6 = get_sign(r12);
+  double t7 = get_sign(r13);
   double t8 = r11 * r11;
   double t9 = r12 * r12;
   double t10 = t2 * t2;
@@ -194,11 +194,11 @@ void d_pz_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
   double t13 = t8 + t9;
   double t14 = t10 + t11 + t12;
   double t15 = 1 / t14;
-  double t17 = std::sqrt(t14);
+  double t17 = sqrt(t14);
   double t16 = t15 * t15;
   double t18 = 1 / t17;
-  double t20 = std::cos(t17);
-  double t21 = std::sin(t17);
+  double t20 = cos(t17);
+  double t21 = sin(t17);
   double t19 = t18 * t18 * t18;
   double t22 = t20 - 1;
   double t23 = t18 * t21;
@@ -228,10 +228,10 @@ void d_pz_lie_mat(const Eigen::MatrixXf& X1, const Eigen::MatrixXf& Y1, const Ei
 void d_px_euler_mat(const Eigen::MatrixXf& x11, const Eigen::MatrixXf& y11, const Eigen::MatrixXf& z11,
                     const double& rpy11, const double& rpy12, const double& rpy13, Eigen::MatrixXf& dx_mat)
 {
-  double t4 = std::cos(rpy12);
-  double t5 = std::cos(rpy13);
-  double t6 = std::sin(rpy12);
-  double t7 = std::sin(rpy13);
+  double t4 = cos(rpy12);
+  double t5 = cos(rpy13);
+  double t6 = sin(rpy12);
+  double t7 = sin(rpy13);
 
   dx_mat.setZero();
   dx_mat.row(0).setOnes();
@@ -242,12 +242,12 @@ void d_px_euler_mat(const Eigen::MatrixXf& x11, const Eigen::MatrixXf& y11, cons
 void d_py_euler_mat(const Eigen::MatrixXf& x11, const Eigen::MatrixXf& y11, const Eigen::MatrixXf& z11,
                     const double& rpy11, const double& rpy12, const double& rpy13, Eigen::MatrixXf& dy_mat)
 {
-  double t5 = std::cos(rpy11);
-  double t6 = std::cos(rpy12);
-  double t7 = std::cos(rpy13);
-  double t8 = std::sin(rpy11);
-  double t9 = std::sin(rpy12);
-  double t10 = std::sin(rpy13);
+  double t5 = cos(rpy11);
+  double t6 = cos(rpy12);
+  double t7 = cos(rpy13);
+  double t8 = sin(rpy11);
+  double t9 = sin(rpy12);
+  double t10 = sin(rpy13);
 
   dy_mat.setZero();
   dy_mat.row(1).setOnes();
@@ -259,12 +259,12 @@ void d_py_euler_mat(const Eigen::MatrixXf& x11, const Eigen::MatrixXf& y11, cons
 void d_pz_euler_mat(const Eigen::MatrixXf& x11, const Eigen::MatrixXf& y11, const Eigen::MatrixXf& z11,
                     const double& rpy11, const double& rpy12, const double& rpy13, Eigen::MatrixXf& dz_mat)
 {
-  double t5 = std::cos(rpy11);
-  double t6 = std::cos(rpy12);
-  double t7 = std::cos(rpy13);
-  double t8 = std::sin(rpy11);
-  double t9 = std::sin(rpy12);
-  double t10 = std::sin(rpy13);
+  double t5 = cos(rpy11);
+  double t6 = cos(rpy12);
+  double t7 = cos(rpy13);
+  double t8 = sin(rpy11);
+  double t9 = sin(rpy12);
+  double t10 = sin(rpy13);
   dz_mat.setZero();
   dz_mat.row(2).setOnes();
   dz_mat.row(3) = (x11 * (t5 * t10 + t7 * t8 * t9) + y11 * (t5 * t7 - t8 * t9 * t10) - z11 * t6 * t8);
@@ -286,7 +286,7 @@ double evaluateCost(const Eigen::Matrix4f& H, const Eigen::MatrixXf& points, con
   return getCost(template_bound, transformed_points);
 }
 
-double computeCost_lie(const std::vector<double>& x, std::vector<double>& grad, void* func_data)
+double computeCost_lie(const vector<double>& x, vector<double>& grad, void* func_data)
 {
   Eigen::MatrixXf* d = reinterpret_cast<Eigen::MatrixXf*>(func_data);
   int num_points = d->cols() - 1;  // last column is passed as boundary
@@ -346,7 +346,7 @@ double computeCost_lie(const std::vector<double>& x, std::vector<double>& grad, 
   return cost;
 }
 
-double computeCost_euler(const std::vector<double>& x, std::vector<double>& grad, void* func_data)
+double computeCost_euler(const vector<double>& x, vector<double>& grad, void* func_data)
 {
   Eigen::MatrixXf* d = reinterpret_cast<Eigen::MatrixXf*>(func_data);
   int num_points = d->cols() - 1;  // last column is passed as boundary
@@ -428,7 +428,7 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
   if (_debug_info)
   {
     ROS_DEBUG_STREAM("==== _optimizePose ====");
-    float distance = std::sqrt(pow(cluster.average.x, 2) + pow(cluster.average.y, 2) + pow(cluster.average.z, 2));
+    float distance = sqrt(pow(cluster.average.x, 2) + pow(cluster.average.y, 2) + pow(cluster.average.z, 2));
     ROS_DEBUG_STREAM("Distance : " << distance);
     ROS_DEBUG_STREAM("Actual Points: " << cluster.data.size() + cluster.edge_points.size());
     ROS_DEBUG_STREAM("Inital Cost: " << initial_cost);
@@ -457,7 +457,7 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
   }
 
   // initial guess
-  std::vector<double> x(6);
+  vector<double> x(6);
   x[0] = cluster.initial_pose.translation[0];
   x[1] = cluster.initial_pose.translation[1];
   x[2] = cluster.initial_pose.translation[2];
@@ -476,7 +476,7 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
   }
 
   // x, y, z, r, p, y
-  std::vector<double> lb(6), ub(6);
+  vector<double> lb(6), ub(6);
   lb[0] = x[0] - 0.2;  // in meters
   lb[1] = x[1] - 0.2;
   lb[2] = x[2] - 0.2;
@@ -573,18 +573,9 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
   opt.set_lower_bounds(lb);
   opt.set_upper_bounds(ub);
   opt.set_xtol_rel(x_tol);
-  std::vector<double> steps = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };  // tx, ty, tz, r, p, y
+  vector<double> steps = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };  // tx, ty, tz, r, p, y
   opt.set_default_initial_step(steps);
-  if (_derivative_method)
-  {
-    opt.set_min_objective(computeCost_euler, &data);
-  }
-  else
-  {
-    opt.set_min_objective(computeCost_lie, &data);
-  }
-
-  // opt.set_maxtime(max_time);
+  opt.set_min_objective(_derivative_method ? computeCost_euler : computeCost_lie, &data);
 
   // [Error Code]
   // https://github.com/stevengj/nlopt/blob/
@@ -610,7 +601,7 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
       status = -3;
       if (_debug_info)
       {
-        ROS_WARN_STREAM("Optimized Cost too large: " << std::setprecision(3) << minf);
+        ROS_WARN_STREAM("Optimized Cost too large: " << setprecision(3) << minf);
         ROS_WARN_STREAM("Inital Cost: " << initial_cost);
       }
       if (initial_cost < 0.1 * _optimization_percent * cluster.inliers / 1000)
@@ -647,8 +638,7 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
     {
       if (_derivative_method)
       {
-        ROS_DEBUG_STREAM("Optimzed euler angle : " << x[3] * 180 / M_PI << ", " << x[4] * 180 / M_PI << ", "
-                                                   << x[5] * 180 / M_PI);
+        ROS_DEBUG_STREAM("Optimzed euler angle : " << RAD2DEG(x[3]) << ", " << RAD2DEG(x[4]) << ", " << RAD2DEG(x[5]));
       }
       else
       {
@@ -668,16 +658,17 @@ int LiDARTag::_optimizePose(ClusterFamily_t& cluster)
     if (_debug_info)
     {
       nlopt_result results_nlopt = static_cast<nlopt_result>(result);
-      ROS_DEBUG_STREAM("Optimization result: " << std::string(nlopt_result_to_string(results_nlopt)));
-      ROS_DEBUG_STREAM("Optimized cost is: " << std::setprecision(3) << minf);
+      ROS_DEBUG_STREAM("Optimization result: " << string(nlopt_result_to_string(results_nlopt)));
+      ROS_DEBUG_STREAM("Optimized cost is: " << setprecision(3) << minf);
       ROS_DEBUG_STREAM("Found minimum at \n" << homogeneous);
     }
   }
-  catch (std::exception& e)
+  catch (exception& e)
   {
     status = -4;
     if (_debug_info)
       ROS_WARN_STREAM("Pose optimization failed: " << e.what());
+
     if (initial_cost < 0.1 * _optimization_percent * cluster.inliers / 1000)
     {
       status = 3;

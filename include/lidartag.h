@@ -145,7 +145,7 @@ private:
   std::string lidartag_detection_topic;
   // Overall LiDAR system parameters
   LiDARSystem_t _LiDAR_system;
-  int _beam_num;
+  int _beam_num = 0;
   double _vertical_fov;
 
   // PointCould data (for a single scan)

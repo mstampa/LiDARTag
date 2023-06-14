@@ -33,6 +33,7 @@
 #include "utils.h"
 #include "ultra_puck.h"
 
+#include <cmath>
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/sample_consensus/sac_model_line.h>
 #include <pcl/sample_consensus/impl/sac_model_line.hpp>
@@ -707,8 +708,8 @@ void LiDARTag::_pointsPerSquareMeterAtOneMeter()
     system_average += (*i).average;
   }
   system_average /= _LiDAR_system.ring_average_table.size();
-  _LiDAR_system.beam_per_vertical_radian = _beam_num / utils::deg2Rad(_vertical_fov);
-  _LiDAR_system.point_per_horizontal_radian = system_average / utils::deg2Rad(360.0);
+  _LiDAR_system.beam_per_vertical_radian = _beam_num / DEG2RAD(_vertical_fov);
+  _LiDAR_system.point_per_horizontal_radian = system_average / (2 * M_PI);
 }
 
 /*
@@ -907,8 +908,8 @@ inline void LiDARTag::_fillInOrderedPC(const pcl::PointCloud<PointXYZIRT>::Ptr& 
  * */
 float LiDARTag::_getAnglefromPt(PointXYZIRT& point)
 {
-  float distance = std::sqrt(std::pow(point.x, 2) + std::pow(point.y, 2));
-  return utils::rad2Deg(std::atan2(point.z, distance));
+  float distance = hypot(point.x, point.y);
+  return RAD2DEG(atan2(point.z, distance));
 }
 
 void LiDARTag::_getAngleVector(const pcl::PointCloud<PointXYZIRT>::Ptr& pcl_pointcloud, std::vector<float>& angles)
@@ -1178,7 +1179,7 @@ void LiDARTag::_fillInCluster(const std::vector<std::vector<LiDARPoints_t>>& ord
       // that means the special case happened
       // The special case is when first point of a ring is in this cluster
       // so the indices are not consecutive
-      double fill_in_gap = _LiDAR_system.ring_average_table[j].average / 2;
+      double fill_in_gap = _LiDAR_system.ring_average_table[j].average / 2.0;
       if (max_index - min_index < fill_in_gap)
       {
         // remove minimum index itself
@@ -1502,9 +1503,9 @@ void LiDARTag::_tagToRobot(const int& cluster_id, const Eigen::Vector3f& normal_
   pose.rotation = utils::qToR(normal_vec).cast<float>();
   pose.translation << ave.x, ave.y, ave.z;
 
-  pose.yaw = utils::rad2Deg(acos(normal_vec.dot(y)));
-  pose.pitch = -utils::rad2Deg(acos(normal_vec.dot(x)));
-  pose.roll = utils::rad2Deg(acos(normal_vec.dot(z)));
+  pose.yaw = RAD2DEG(acos(normal_vec.dot(y)));
+  pose.pitch = -RAD2DEG(acos(normal_vec.dot(x)));
+  pose.roll = RAD2DEG(acos(normal_vec.dot(z)));
 
   pose.homogeneous.topLeftCorner(3, 3) = pose.rotation;
   pose.homogeneous.topRightCorner(3, 1) = pose.translation;

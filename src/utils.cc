@@ -30,11 +30,13 @@
 
 #include "utils.h"
 
-#include <algorithm>  // std::sort, std::stable_sort
+#include <algorithm>  // sort, stable_sort
 #include <chrono>
 #include <iostream>
 #include <math.h>
-#include <numeric>  // std::iota
+#include <numeric>  // iota
+
+using namespace std;
 
 namespace BipedLab
 {
@@ -51,56 +53,53 @@ double spendCPUHz(const clock_t& t_end, const clock_t& t_start)
   return 1.0 / spendCPUTime(t_end, t_start);
 }
 
-double printSpendCPUHz(const clock_t& t_end, const clock_t& t_start, std::string txt)
+double printSpendCPUHz(const clock_t& t_end, const clock_t& t_start, string txt)
 {
   auto ans = spendCPUHz(t_end, t_start);
-  std::cout << std::fixed << std::setprecision(2) << txt << ans << " [Hz]" << std::endl;
+  cout << fixed << setprecision(2) << txt << ans << " [Hz]" << endl;
   return ans;
 }
 
-double printSpendCPUHz(const std::clock_t& t_end, const std::clock_t& t_start)
+double printSpendCPUHz(const clock_t& t_end, const clock_t& t_start)
 {
-  std::string text = "CPU time used: ";
+  string text = "CPU time used: ";
   return printSpendCPUHz(t_end, t_start, text);
 }
 
-double spendElapsedTime(const std::chrono::steady_clock::time_point& t_end,
-                        const std::chrono::steady_clock::time_point& t_start)
+double spendElapsedTime(const chrono::steady_clock::time_point& t_end, const chrono::steady_clock::time_point& t_start)
 {
-  std::chrono::duration<double> duration = t_end - t_start;
+  chrono::duration<double> duration = t_end - t_start;
   return duration.count();
 }
 
-double spendElapsedTimeMilli(const std::chrono::steady_clock::time_point& t_end,
-                             const std::chrono::steady_clock::time_point& t_start)
+double spendElapsedTimeMilli(const chrono::steady_clock::time_point& t_end,
+                             const chrono::steady_clock::time_point& t_start)
 {
   return 1e3 * spendElapsedTime(t_end, t_start);
 }
 
-double spendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
-                      const std::chrono::steady_clock::time_point& t_start)
+double spendElapsedHz(const chrono::steady_clock::time_point& t_end, const chrono::steady_clock::time_point& t_start)
 {
   return 1.0 / spendElapsedTime(t_end, t_start);
 }
 
-double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
-                           const std::chrono::steady_clock::time_point& t_start, std::string txt)
+double printSpendElapsedHz(const chrono::steady_clock::time_point& t_end,
+                           const chrono::steady_clock::time_point& t_start, string txt)
 {
   auto ans = spendElapsedHz(t_end, t_start);
-  std::cout << std::fixed << std::setprecision(2) << txt << ans << " [Hz]" << std::endl;
+  cout << fixed << setprecision(2) << txt << ans << " [Hz]" << endl;
   return ans;
 }
 
-double printSpendElapsedHz(const std::chrono::steady_clock::time_point& t_end,
-                           const std::chrono::steady_clock::time_point& t_start)
+double printSpendElapsedHz(const chrono::steady_clock::time_point& t_end,
+                           const chrono::steady_clock::time_point& t_start)
 {
-  std::string text = "Elapsed time: ";
-  return printSpendElapsedHz(t_end, t_start, text);
+  return printSpendElapsedHz(t_end, t_start, "Elapsed time: ");
 }
 
-std::string tranferToLowercase(std::string& t_data)
+string tranferToLowercase(string& t_data)
 {
-  std::transform(t_data.begin(), t_data.end(), t_data.begin(), ::tolower);
+  transform(t_data.begin(), t_data.end(), t_data.begin(), ::tolower);
   return t_data;
 }
 
@@ -122,21 +121,20 @@ bool isRotationMatrix(Eigen::Matrix3f& t_R)
 
 Eigen::Vector3f rotationMatrixToEulerAngles(Eigen::Matrix3f& t_R)
 {
-  float sy = std::sqrt(t_R(0, 0) * (0, 0) + t_R(1, 0) * (1, 0));
-
+  float sy = sqrt(t_R(0, 0) * (0, 0) + t_R(1, 0) * (1, 0));
   bool singular = sy < 1e-6;
-
   float x, y, z;
+
   if (!singular)
   {
-    x = rad2Deg(std::atan(t_R(2, 1) / t_R(2, 2)));
-    y = rad2Deg(std::atan(-t_R(2, 0) / sy));
-    z = rad2Deg(std::atan(t_R(1, 0) / t_R(0, 0)));
+    x = RAD2DEG(atan(t_R(2, 1) / t_R(2, 2)));
+    y = RAD2DEG(atan(-t_R(2, 0) / sy));
+    z = RAD2DEG(atan(t_R(1, 0) / t_R(0, 0)));
   }
   else
   {
-    x = rad2Deg(std::atan(-t_R(1, 2) / t_R(1, 1)));
-    y = rad2Deg(std::atan(-t_R(2, 0) / sy));
+    x = RAD2DEG(atan(-t_R(1, 2) / t_R(1, 1)));
+    y = RAD2DEG(atan(-t_R(2, 0) / sy));
     z = 0;
   }
 
@@ -159,7 +157,7 @@ bool checkParameters(int t_n, ...)
       continue;
     else
     {
-      std::cout << "didn't get i: " << i << " in the launch file" << std::endl;
+      cout << "didn't get i: " << i << " in the launch file" << endl;
       Pass = false;
       break;
     }
@@ -172,8 +170,8 @@ bool checkParameters(int t_n, ...)
 // DO NOT want to change their stucture
 void COUT(const PointXYZIRT& t_p)
 {
-  std::cout << "x: " << t_p.x << ", y: " << t_p.y << ", z: " << t_p.z << ", ring: " << t_p.ring
-            << ", intensity: " << t_p.intensity << std::endl;
+  cout << "x: " << t_p.x << ", y: " << t_p.y << ", z: " << t_p.z << ", ring: " << t_p.ring
+       << ", intensity: " << t_p.intensity << endl;
 }
 
 bool compareIndex(LiDARPoints_t* A, LiDARPoints_t* B)
@@ -181,7 +179,7 @@ bool compareIndex(LiDARPoints_t* A, LiDARPoints_t* B)
   return A->index < B->index;
 }
 
-uint64_t bitShift(std::string const& t_value)
+uint64_t bitShift(string const& t_value)
 {
   uint64_t result = 0;
 
@@ -195,7 +193,7 @@ uint64_t bitShift(std::string const& t_value)
   return result;
 }
 
-void normalize(std::vector<float>& x, std::vector<float>& y, std::vector<float>& z, std::vector<float>& I,
+void normalize(vector<float>& x, vector<float>& y, vector<float>& z, vector<float>& I,
                const pcl::PointCloud<LiDARPoints_t*> t_payload)
 {
   // normlize the y,z so the top left is (0,0) and bottom right is (1,1)
@@ -236,9 +234,9 @@ void normalize(std::vector<float>& x, std::vector<float>& y, std::vector<float>&
       max_intensity = t_payload[i]->point.intensity;
   }
 
-  float dx = std::abs(front_x - back_x);
-  float dy = std::abs(top_left_y - bottom_right_y);
-  float dz = std::abs(top_left_z - bottom_right_z);
+  float dx = abs(front_x - back_x);
+  float dy = abs(top_left_y - bottom_right_y);
+  float dz = abs(top_left_z - bottom_right_z);
   for (int i = 0; i < t_payload.size(); ++i)
   {
     x[i] = (back_x - t_payload[i]->point.x) / 8;
@@ -248,7 +246,7 @@ void normalize(std::vector<float>& x, std::vector<float>& y, std::vector<float>&
   }
 }
 
-void normalizeByAve(std::vector<float>& x, std::vector<float>& y, std::vector<float>& z, std::vector<float>& I,
+void normalizeByAve(vector<float>& x, vector<float>& y, vector<float>& z, vector<float>& I,
                     const pcl::PointCloud<LiDARPoints_t*> t_payload)
 {
   float ave_x = 0;
@@ -286,7 +284,6 @@ PointXYZIRT pointsAddDivide(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2, fl
   tmp.y = (t_p1.y + t_p2.y) / t_d;
   tmp.z = (t_p1.z + t_p2.z) / t_d;
   tmp.intensity = (t_p1.intensity + t_p2.intensity) / t_d;
-
   return tmp;
 }
 
@@ -298,7 +295,6 @@ PointXYZIRT vectorize(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2)
   tmp.y = (t_p2.y - t_p1.y);
   tmp.z = (t_p2.z - t_p1.z);
   tmp.intensity = (t_p2.intensity - t_p1.intensity);
-
   return tmp;
 }
 
@@ -309,24 +305,23 @@ float dot(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2)
 
 float Norm(const PointXYZIRT& t_p)
 {
-  return std::sqrt(std::pow(t_p.y, 2) + std::pow(t_p.z, 2));
+  return hypot(t_p.y, t_p.z);
 }
 
 double MVN(const float& t_tag_size, const int& t_d, const Eigen::Vector2f& t_X, const Eigen::Vector2f t_mean)
 {
   Eigen::Matrix2f Sigma;
   Sigma << t_tag_size / t_d / 2, 0, 0, t_tag_size / t_d / 2;
-  double sqrt2pi = std::sqrt(2 * M_PI);
+  double sqrt2pi = sqrt(2 * M_PI);
   double QuadForm = (t_X - t_mean).transpose() * Sigma.inverse() * (t_X - t_mean);
-  double norm = std::pow(sqrt2pi, -2) * std::pow(Sigma.determinant(), -0.5);
-
+  double norm = pow(sqrt2pi, -2) * pow(Sigma.determinant(), -0.5);
   return norm * exp(-0.5 * QuadForm);
 }
 
 // step between p1 and p2
 float getStep(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2, const int t_d)
 {
-  return std::sqrt(std::pow((t_p2.y - t_p1.y), 2) + std::pow((t_p2.z - t_p1.z), 2)) / t_d;
+  return hypot(t_p2.y - t_p1.y, t_p2.z - t_p1.z) / t_d;
 }
 
 // To get the t where p1 + t * v12 is the point that p projects onto line p12
@@ -337,7 +332,7 @@ void getProjection(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2, const Point
   PointXYZIRT v12 = vectorize(t_p1, t_p2);
   PointXYZIRT v1p = vectorize(t_p1, t_p);
 
-  k = std::abs(dot(v12, v1p) / Norm(v12));
+  k = abs(dot(v12, v1p) / Norm(v12));
 }
 
 void assignCellIndex(const float& t_tag_size, const Eigen::Matrix3f& t_R, PointXYZIRT& t_p_reference,
@@ -357,14 +352,14 @@ void assignCellIndex(const float& t_tag_size, const Eigen::Matrix3f& t_R, PointX
   t_p_reference.x = x;
   t_p_reference.y = y;
   t_p_reference.z = z;
-  float ss = t_tag_size / t_d;                                              // scale back to the unit square
-  y = std::max(std::min(y, t_d / 2 * ss), (-t_d / 2 * ss + (float)0.001));  // don't match to 6
-  z = std::max(std::min(z, t_d / 2 * ss), (-t_d / 2 * ss + (float)0.001));  // don't match to 6
-  int cellIndexT = t_d / 2 + std::floor(-y / ss);
-  int cellIndexK = t_d / 2 + std::floor(-z / ss);
+  float ss = t_tag_size / t_d;                                    // scale back to the unit square
+  y = max(min(y, t_d / 2 * ss), (-t_d / 2 * ss + (float)0.001));  // don't match to 6
+  z = max(min(z, t_d / 2 * ss), (-t_d / 2 * ss + (float)0.001));  // don't match to 6
+  int cellIndexT = t_d / 2 + floor(-y / ss);
+  int cellIndexK = t_d / 2 + floor(-z / ss);
 
-  float cy = (std::ceil(y / ss) - 0.5) * ss;  // offset to center of each ceil
-  float cz = (std::ceil(z / ss) - 0.5) * ss;
+  float cy = (ceil(y / ss) - 0.5) * ss;  // offset to center of each ceil
+  float cz = (ceil(z / ss) - 0.5) * ss;
 
   // which grid it belongs to (in 1-16 vector form)?
   Eigen::Vector2f X(y, z);
@@ -377,7 +372,7 @@ void assignCellIndex(const float& t_tag_size, const Eigen::Matrix3f& t_R, PointX
 }
 
 // normalize weight and classify them into grid
-void sortPointsToGrid(std::vector<std::vector<PayloadVoting_t*>>& t_grid, std::vector<PayloadVoting_t>& t_votes)
+void sortPointsToGrid(vector<vector<PayloadVoting_t*>>& t_grid, vector<PayloadVoting_t>& t_votes)
 {
   for (int i = 0; i < t_votes.size(); ++i)
     t_grid[t_votes[i].cell].push_back(&t_votes[i]);
@@ -453,7 +448,6 @@ PointXYZIRT toVelodyne(const Eigen::Vector3f& t_p)
   point.x = t_p[0];
   point.y = t_p[1];
   point.z = t_p[2];
-
   return point;
 }
 
@@ -463,7 +457,6 @@ Eigen::Vector3f toEigen(const PointXYZIRT& t_point)
   tmp[0] = t_point.x;
   tmp[1] = t_point.y;
   tmp[2] = t_point.z;
-
   return tmp;
 }
 
@@ -476,7 +469,7 @@ void minus(PointXYZIRT& t_p1, const PointXYZIRT& t_p2)
 
 float distance(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2)
 {
-  return std::sqrt(std::pow((t_p1.x - t_p2.x), 2) + std::pow((t_p1.y - t_p2.y), 2) + std::pow((t_p1.z - t_p2.z), 2));
+  return hypot(t_p1.x - t_p2.x, t_p1.y - t_p2.y, t_p1.z - t_p2.z);
 }
 
 /*
@@ -486,7 +479,7 @@ float distance(const PointXYZIRT& t_p1, const PointXYZIRT& t_p2)
 template <class T, class U>
 float getAngle(T a, U b)
 {
-  return rad2Deg(std::acos(dot(a, b) / (Norm(a) * Norm(b))));
+  return RAD2DEG(acos(dot(a, b) / (Norm(a) * Norm(b))));
 }
 
 /*
@@ -499,20 +492,13 @@ int checkCorners(const float Tagsize, const PointXYZIRT& t_p1, const PointXYZIRT
                  const PointXYZIRT& t_p4)
 {
   // XXX tunable
-  float ratio = 1 / 3;
   float AngleLowerBound = 75;
   float AngleUpperBound = 105;
-  if (distance(t_p1, t_p2) < Tagsize * ratio)
-    return -1;
-  if (distance(t_p1, t_p3) < Tagsize * ratio)
-    return -1;
-  if (distance(t_p1, t_p4) < Tagsize * ratio)
-    return -1;
-  if (distance(t_p2, t_p3) < Tagsize * ratio)
-    return -1;
-  if (distance(t_p2, t_p4) < Tagsize * ratio)
-    return -1;
-  if (distance(t_p3, t_p4) < Tagsize * ratio)
+
+  auto dists = vector({ distance(t_p1, t_p2), distance(t_p1, t_p3), distance(t_p1, t_p4), distance(t_p2, t_p3),
+                        distance(t_p2, t_p4), distance(t_p3, t_p4) });
+  auto cmp = Tagsize / 3.0;
+  if (any_of(dists.begin(), dists.end(), [cmp](float d) { return d < cmp; }))
     return -1;
 
   // angle between p12 and p14
@@ -592,17 +578,17 @@ Eigen::Matrix3d qToR(const T& t_pose)
   double b = t_pose.orientation.x;
   double c = t_pose.orientation.y;
   double d = t_pose.orientation.z;
-  R(0, 0) = std::pow(a, 2) + std::pow(b, 2) - std::pow(c, 2) - std::pow(d, 2);
+  R(0, 0) = a * a + b * b - c * c - d * d;
   R(0, 1) = 2 * (b * c - a * d);
   R(0, 2) = 2 * (b * d + a * c);
 
   R(1, 0) = 2 * (b * c + a * d);
-  R(1, 1) = std::pow(a, 2) - std::pow(b, 2) + std::pow(c, 2) - std::pow(d, 2);
+  R(1, 1) = a * a - b * b + c * c - d * d;
   R(1, 2) = 2 * (c * d - a * b);
 
   R(2, 0) = 2 * (b * d - a * c);
   R(2, 1) = 2 * (c * d + a * b);
-  R(2, 2) = std::pow(a, 2) - std::pow(b, 2) - std::pow(c, 2) + std::pow(d, 2);
+  R(2, 2) = a * a - b * b - c * c + d * d;
 
   return R;
 }
@@ -614,17 +600,17 @@ Eigen::Matrix3d qToR(const Eigen::Vector3f& t_pose)
   double b = t_pose(0);  // x
   double c = t_pose(1);  // y
   double d = t_pose(2);  // z
-  R(0, 0) = std::pow(a, 2) + std::pow(b, 2) - std::pow(c, 2) - std::pow(d, 2);
+  R(0, 0) = a * a + b * b - c * c - d * d;
   R(0, 1) = 2 * (b * c - a * d);
   R(0, 2) = 2 * (b * d + a * c);
 
   R(1, 0) = 2 * (b * c + a * d);
-  R(1, 1) = std::pow(a, 2) - std::pow(b, 2) + std::pow(c, 2) - std::pow(d, 2);
+  R(1, 1) = a * a - b * b + c * c - d * d;
   R(1, 2) = 2 * (c * d - a * b);
 
   R(2, 0) = 2 * (b * d - a * c);
   R(2, 1) = 2 * (c * d + a * b);
-  R(2, 2) = std::pow(a, 2) - std::pow(b, 2) - std::pow(c, 2) + std::pow(d, 2);
+  R(2, 2) = a * a - b * b - c * c + d * d;
 
   return R;
 }
@@ -632,10 +618,10 @@ Eigen::Matrix3d qToR(const Eigen::Vector3f& t_pose)
 /*
  * Returns all numbers not in set, where the total set is [0,n)
  */
-std::vector<int> complementOfSet(const std::vector<int>& set, std::size_t n)
+vector<int> complementOfSet(const vector<int>& set, size_t n)
 {
-  std::size_t curr_idx = 0;
-  std::vector<int> complement;
+  size_t curr_idx = 0;
+  vector<int> complement;
 
   for (auto i = 0; i < n; i++)
   {
@@ -665,29 +651,28 @@ Eigen::Vector3f cross_product(Eigen::Vector3f v1, Eigen::Vector3f v2)
   return res;
 }
 
-void readDirectory(const std::string& name, std::vector<std::string>& v)
+void readDirectory(const string& name, vector<string>& v)
 {
   boost::filesystem::path p(name);
   boost::filesystem::directory_iterator start(p);
   boost::filesystem::directory_iterator end;
-  std::transform(start, end, std::back_inserter(v), PathLeafString());
-  std::sort(v.begin(), v.end());
+  transform(start, end, back_inserter(v), PathLeafString());
+  sort(v.begin(), v.end());
 }
 
 float computeMedian(const Eigen::VectorXf& eigen_vec)
 {
   assert(eigen_vec.size() != 0);
-  std::vector<float> vec(eigen_vec.data(), eigen_vec.data() + eigen_vec.size());
+  vector<float> vec(eigen_vec.data(), eigen_vec.data() + eigen_vec.size());
   assert(vec.size() != 0);
   if (vec.size() % 2 == 0)
   {
     const auto median_it1 = vec.begin() + vec.size() / 2 - 1;
     const auto median_it2 = vec.begin() + vec.size() / 2;
 
-    std::nth_element(vec.begin(), median_it1, vec.end());
+    nth_element(vec.begin(), median_it1, vec.end());
     const auto e1 = *median_it1;
-
-    std::nth_element(vec.begin(), median_it2, vec.end());
+    nth_element(vec.begin(), median_it2, vec.end());
     const auto e2 = *median_it2;
 
     return (e1 + e2) / 2;
@@ -695,7 +680,7 @@ float computeMedian(const Eigen::VectorXf& eigen_vec)
   else
   {
     const auto median_it = vec.begin() + vec.size() / 2;
-    std::nth_element(vec.begin(), median_it, vec.end());
+    nth_element(vec.begin(), median_it, vec.end());
 
     return *median_it;
   }
@@ -706,7 +691,6 @@ Eigen::MatrixXf convertXYZIToHomogeneous(const Eigen::MatrixXf& mat_xyzi)
   assert(mat_xyzi.rows() == 4 && "The input dimension is wrong, it should be four");
   Eigen::MatrixXf mat_h = mat_xyzi;
   mat_h.row(3).setOnes();
-
   return mat_h;
 }
 
@@ -719,22 +703,12 @@ Eigen::Matrix4f computeTransformation(Eigen::Vector3f rot_v, Eigen::Vector3f tra
   Eigen::Matrix4f H = Eigen::Matrix4f::Identity(4, 4);
   H.topLeftCorner(3, 3) = computeRotX(rot_v(0)) * computeRotY(rot_v(1)) * computeRotZ(rot_v(2));
   H.topRightCorner(3, 1) = trans_v;
-
   return H;
 }
 
 double get_sign(double x)
 {
-  double output;
-  if (x >= 0)
-  {
-    output = 1;
-  }
-  else
-  {
-    output = -1;
-  }
-  return output;
+  return (x >= 0) ? 1 : -1;
 }
 
 Eigen::Matrix3f skew(const Eigen::Vector3d v)
@@ -754,23 +728,17 @@ Eigen::Matrix3f Exp_SO3(const Eigen::Vector3d w)
 {
   double theta = w.norm();
   Eigen::Matrix3f A = skew(w);
-  Eigen::Matrix3f output;
-  // cout << Eigen::Matrix3d::Identity() << endl;
+  Eigen::Matrix3f output = Eigen::Matrix3f::Identity();
+
   if (theta == 0)
-  {
-    output = Eigen::Matrix3f::Identity();
-  }
-  else
-  {
-    output = Eigen::Matrix3f::Identity() + (std::sin(theta) / theta) * A +
-             ((1 - std::cos(theta)) / std::pow(theta, 2)) * A * A;
-  }
+    output += +(sin(theta) / theta) * A + ((1 - cos(theta)) / (theta * theta)) * A * A;
+
   return output;
 }
 
 Eigen::Vector3d Log_SO3(const Eigen::Matrix3f A)
 {
-  double theta = std::acos((A(0, 0) + A(1, 1) + A(2, 2) - 1) / 2);
+  double theta = acos((A(0, 0) + A(1, 1) + A(2, 2) - 1) / 2);
   Eigen::Matrix3f A_transpose = A.transpose();
   Eigen::Vector3d output;
   if (theta == 0)
@@ -779,7 +747,7 @@ Eigen::Vector3d Log_SO3(const Eigen::Matrix3f A)
   }
   else
   {
-    output = unskew(theta * (A - A_transpose) / (2 * std::sin(theta)));
+    output = unskew(theta * (A - A_transpose) / (2 * sin(theta)));
   }
   return output;
 }
@@ -800,14 +768,14 @@ void sortEigenVectorIndices(const Eigen::MatrixXf& mat, Eigen::VectorXi& indices
 {
   // initialize original index locations
   int num_elements = mat.cols();
-  std::vector<int> idx(num_elements);
-  std::iota(idx.begin(), idx.end(), 0);
+  vector<int> idx(num_elements);
+  iota(idx.begin(), idx.end(), 0);
 
   // sort indexes based on comparing values in v
-  // using std::stable_sort instead of std::sort
+  // using stable_sort instead of sort
   // to avoid unnecessary index re-orderings
   // when v contains elements of equal values
-  std::stable_sort(idx.begin(), idx.end(), [&mat](int i1, int i2) {
+  stable_sort(idx.begin(), idx.end(), [&mat](int i1, int i2) {
     return (mat(1, i1) < mat(1, i2)) || (mat(1, i1) == mat(1, i2) && mat(2, i1) < mat(2, i2));
   });
 
